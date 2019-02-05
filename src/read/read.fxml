@@ -1,23 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
 
-<ScrollPane fx:id="mScrollPane" fitToHeight="true" fitToWidth="true" prefHeight="671.0" prefWidth="896.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="read.ReadController">
-   <content>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0">
-         <children>
-            <StackPane prefHeight="669.0" prefWidth="894.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<BorderPane prefHeight="720.0" prefWidth="906.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="read.ReadController">
+   <center>
+      <ScrollPane fx:id="mScrollPane" fitToHeight="true" fitToWidth="true" prefHeight="671.0" prefWidth="896.0" BorderPane.alignment="CENTER">
+         <content>
+            <AnchorPane prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <ImageView fx:id="mIv" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER" />
+                  <StackPane prefHeight="669.0" prefWidth="894.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <ImageView fx:id="mIv" onScroll="#handleZoom" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER" />
+                     </children>
+                  </StackPane>
+                  <Label text="Label" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+                  <Label fx:id="currentInputLb" text="输入单词" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
                </children>
-            </StackPane>
-            <Label text="Label" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0" />
-            <Label fx:id="currentInputLb" text="输入单词" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
-         </children>
-      </AnchorPane>
-   </content>
-</ScrollPane>
+            </AnchorPane>
+         </content>
+      </ScrollPane>
+   </center>
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+</BorderPane>
