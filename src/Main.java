@@ -22,13 +22,11 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class Main extends Application {
-    private org.jsoup.nodes.Document doc;
-    private Text text;
 
     @Override
     public void start(Stage primaryStage) throws IOException{
         Parent root= FXMLLoader.load(getClass().getResource("read\\read.fxml"));
-        primaryStage.setTitle("标题");
+        primaryStage.setTitle("英文漫画阅读器");
 //        primaryStage.setMaximized(true);
         primaryStage.setScene(new Scene(root,800,500));
         primaryStage.show();
@@ -39,27 +37,5 @@ public class Main extends Application {
      */
     public static void main(String[] args) {
         launch(args);
-    }
-
-    private void jsoup() {
-        try {
-            doc = Jsoup.connect("http://jandan.net/duan/page-91#comments")
-                    .timeout(10000).get();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (null != doc) {
-            Element mangaListElements = doc.body().getElementById("wrapper").getElementById("body")
-                    .getElementById("content").getElementById("comments");
-            Elements eles = mangaListElements.getElementsByClass("commentlist").last().
-                    getElementsByTag("li");
-            String result="";
-            for (Element ele : eles) {
-//                System.out.println(ele.select("div.text").text());
-                result+=ele.select("div.text").text()+"\n";
-            }
-            text.setText(result);
-        }
     }
 }

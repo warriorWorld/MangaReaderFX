@@ -1,0 +1,29 @@
+package configure;
+
+
+import java.io.File;
+
+/**
+ * Created by Administrator on 2017/7/19.
+ */
+
+public class Configure {
+    public final static boolean isTest = true;
+    //数据库版本号
+    public static final int DB_VERSION = 1;
+    public final static String[] websList = {"MangaReader", "KaKaLot"};
+    public final static String[] masterWebsList = {"MangaReader", "NManga", "KaKaLot", "LManga"};
+    public final static String[] VPN_MUST_LIST = {"NOTHING"};
+    public final static String DST_FOLDER_NAME = "Manga";
+    final public static String STORAGEPATH = "E:\\" + DST_FOLDER_NAME;
+    final public static String DOWNLOAD_PATH = "E:\\manga\\download";
+    final public static String WRONG_WEBSITE_EXCEPTION = "wrong_website_exception";
+    final public static String YOUDAO = "http://fanyi.youdao.com/openapi.do?keyfrom=mangaeasywa" +
+            "tch&key=986400551&type=data&doctype=json&version=1.1&q=";
+    // 3DES加密key
+    final public static String key = "iq2szojof6x1ckgejwe52urw";
+    //收藏类型
+    final public static int COLLECT_TYPE_COLLECT = 0;
+    final public static int COLLECT_TYPE_WAIT_FOR_UPDATE = 1;
+    final public static int COLLECT_TYPE_FINISHED = 2;
+}

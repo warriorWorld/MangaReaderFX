@@ -1,8 +1,13 @@
 package read;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -19,6 +24,7 @@ import javafx.scene.layout.AnchorPane;
 import utils.TextUtils;
 
 public class ReadController implements Initializable {
+    private org.jsoup.nodes.Document doc;
     public ImageView mIv;
     public ScrollPane mScrollPane;
     public Label currentInputLb;
@@ -61,5 +67,26 @@ public class ReadController implements Initializable {
 
     public void handleZoom() {
         System.out.println("handle zoom");
+    }
+
+    private void jsoup() {
+        try {
+            doc = Jsoup.connect("http://jandan.net/duan/page-91#comments")
+                    .timeout(10000).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (null != doc) {
+            Element mangaListElements = doc.body().getElementById("wrapper").getElementById("body")
+                    .getElementById("content").getElementById("comments");
+            Elements eles = mangaListElements.getElementsByClass("commentlist").last().
+                    getElementsByTag("li");
+            String result="";
+            for (Element ele : eles) {
+//                System.out.println(ele.select("div.text").text());
+                result+=ele.select("div.text").text()+"\n";
+            }
+        }
     }
 }
