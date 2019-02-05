@@ -9,6 +9,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 
@@ -21,6 +22,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import spider.FileSpider;
 import utils.TextUtils;
 
 public class ReadController implements Initializable {
@@ -30,20 +32,22 @@ public class ReadController implements Initializable {
     public Label currentInputLb;
     private String currentInput = "";
     private Clipboard mClipboard;
+    private ArrayList<String> paths = new ArrayList<>();
+    private int currentPosition = 0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         mClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        paths = FileSpider.getInstance().getMangaDetail("E:\\Manga\\testmanga");
         initUI();
     }
 
     private void initUI() {
         mIv.setPreserveRatio(true);
-        mIv.setImage(new Image("http://ww3.sinaimg.cn/mw600/0073ob6Pgy1fzvjk6zrlkj30u0140x6p.jpg"));
+        mIv.setImage(new Image(paths.get(currentPosition)));
         mScrollPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                mIv.setImage(new Image("http://ws4.sinaimg.cn/mw600/7ca81805gy1fzvloygezfj20m80ci0uo.jpg"));
                 System.out.println(event.getCode());
                 if (event.getCode().toString().length() == 1) {
                     currentInput += event.getCode().toString();
@@ -55,6 +59,16 @@ public class ReadController implements Initializable {
                 } else if (event.getCode().toString().equals("SPACE")) {
                     event.consume();
                     currentInput += " ";
+                } else if (event.getCode().toString().equals("RIGHT")) {
+                    if (currentPosition < paths.size() - 2) {
+                        currentPosition++;
+                        mIv.setImage(new Image(paths.get(currentPosition)));
+                    }
+                } else if (event.getCode().toString().equals("LEFT")) {
+                    if (currentPosition >0) {
+                        currentPosition--;
+                        mIv.setImage(new Image(paths.get(currentPosition)));
+                    }
                 }
                 if (TextUtils.isEmpty(currentInput)) {
                     currentInputLb.setText("输入单词");
@@ -82,10 +96,10 @@ public class ReadController implements Initializable {
                     .getElementById("content").getElementById("comments");
             Elements eles = mangaListElements.getElementsByClass("commentlist").last().
                     getElementsByTag("li");
-            String result="";
+            String result = "";
             for (Element ele : eles) {
 //                System.out.println(ele.select("div.text").text());
-                result+=ele.select("div.text").text()+"\n";
+                result += ele.select("div.text").text() + "\n";
             }
         }
     }

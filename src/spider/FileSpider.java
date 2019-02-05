@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -80,6 +81,26 @@ public class FileSpider {
         }
     }
 
+    public ArrayList<String> getMangaDetail(final String path) {
+        File f = new File(path);//第一级目录 reptile
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+        ArrayList<String> paths = new ArrayList<>();
+        File[] files = f.listFiles();//第二级目录 具体漫画们
+        if (null != files && files.length > 0 && !files[0].isDirectory()) {
+            for (int i = 0; i < files.length; i++) {
+                try {
+                    paths.add(files[i].toURI().toURL().toString());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+            return paths;
+        } else {
+            return null;
+        }
+    }
 
     public static void deleteFile(String file) {
         if (file.contains("file://")) {
@@ -116,9 +137,6 @@ public class FileSpider {
     /**
      * 存图片 TODO
      *
-     * @param b
-     * @param bmpName
-     * @param mangaName
      * @return
      * @childFolder 子文件夹名 因为漫画图片数量太大 所以在多一层子文件夹 自动建立
      */
@@ -165,7 +183,6 @@ public class FileSpider {
 //            e.printStackTrace();
 //        }
 //    }
-
     public String getChildFolderName(int episode, int folderSize) {
         String res;
         int start = ((int) (episode / folderSize)) * folderSize;
@@ -177,9 +194,8 @@ public class FileSpider {
     /**
      * 网络获取图片
      *
-     * @param imageUrl
-     * @return
-//     */
+     * @return //
+     */
 //    public Bitmap loadImageFromNetwork(String imageUrl, String folderName, String fileName) {
 //        Bitmap bitmap = null;
 //        try {
@@ -190,7 +206,6 @@ public class FileSpider {
 //        }
 //        return bitmap;
 //    }
-
     public byte[] File2byte(String filePath) {
         byte[] buffer = null;
         try {

@@ -1,5 +1,7 @@
 package bean;
 
+import java.util.ArrayList;
+
 /**
  * Created by Administrator on 2017/7/18.
  */
@@ -9,6 +11,7 @@ public class ChapterBean extends BaseBean {
     private String chapterPosition;
     private String localThumbnailUrl;
     private String webThumbnailUrl;
+    private ArrayList<String> pics;
 
     public String getChapterUrl() {
         return chapterUrl;
@@ -40,5 +43,13 @@ public class ChapterBean extends BaseBean {
 
     public void setWebThumbnailUrl(String webThumbnailUrl) {
         this.webThumbnailUrl = webThumbnailUrl;
+    }
+
+    public ArrayList<String> getPics() {
+        return pics;
+    }
+
+    public void setPics(ArrayList<String> pics) {
+        this.pics = pics;
     }
 }
