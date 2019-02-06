@@ -33,10 +33,17 @@ public class HttpService {
 
     public <ResultObj> void requestData(String url, FormBody formBody,
                                         Class<ResultObj> objClass, HttpBack callBackInterface) {
-        final Request request = new Request.Builder()
-                .url(url)
-                .post(formBody)
-                .build();
+        Request request;
+        if (null == formBody) {
+            request = new Request.Builder()
+                    .url(url)
+                    .build();
+        } else {
+            request = new Request.Builder()
+                    .url(url)
+                    .post(formBody)
+                    .build();
+        }
         OkHttpClient client = new OkHttpClient();
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
@@ -67,35 +74,6 @@ public class HttpService {
     }
 
     public <ResultObj> void requestGetData(String url, Class<ResultObj> objClass, HttpBack callBackInterface) {
-        final Request request = new Request.Builder()
-                .url(url)
-                .build();
-        OkHttpClient client = new OkHttpClient();
-        Call call = client.newCall(request);
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Update UI here.
-                        AlertDialog.display("Post Failed", e.toString(), "知道了");
-                        callBackInterface.loadFailed(e.toString());
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String res = response.body().string();
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        callBackInterface.loadSucceed(gson.fromJson(res,
-                                objClass));
-                    }
-                });
-            }
-        });
+        requestData(url, null, objClass, callBackInterface);
     }
 }
