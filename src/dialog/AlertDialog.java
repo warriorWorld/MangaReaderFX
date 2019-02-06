@@ -18,6 +18,7 @@ public class AlertDialog {
         window.setMinWidth(300);
         Label messageLb = new Label(message);
         Button closeBtn = new Button(okText);
+        closeBtn.setPadding(new Insets(5,10,5,10));
         closeBtn.setOnAction(event -> {
             window.close();
         });

@@ -11,10 +11,13 @@ import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 import base.BaseController;
+import bean.YoudaoResponse;
+import configure.Configure;
 import dialog.AlertDialog;
 import dialog.EditDialog;
 import javafx.event.EventHandler;
@@ -28,6 +31,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import listener.EditResultListener;
+import okhttp.HttpBack;
+import okhttp.HttpService;
 import spider.FileSpider;
 import utils.TextUtils;
 
@@ -74,9 +79,9 @@ public class ReadController extends BaseController implements Initializable {
                 @Override
                 public void onResult(String result) {
                     try {
-                        toPage(Integer.valueOf(result)-1);
-                    }catch (NumberFormatException e){
-                        AlertDialog.display("错误","请输入数字,并且是整数!","知道了");
+                        toPage(Integer.valueOf(result) - 1);
+                    } catch (NumberFormatException e) {
+                        AlertDialog.display("错误", "请输入数字,并且是整数!", "知道了");
                     }
                 }
             });
@@ -89,6 +94,7 @@ public class ReadController extends BaseController implements Initializable {
                     currentInput += event.getCode().toString().toLowerCase();
                 } else if (event.getCode().toString().equals("ENTER")) {
                     mClipboard.setContents(new StringSelection(currentInput), null);
+                    translateWord(currentInput);
                     currentInput = "";
                 } else if (event.getCode().toString().equals("BACK_SPACE")) {
                     if (currentInput.length() > 0) {
@@ -125,6 +131,34 @@ public class ReadController extends BaseController implements Initializable {
         });
     }
 
+    private void translateWord(final String word) {
+        String url = Configure.YOUDAO + word;
+        HttpService.getInstance().requestGetData(url, YoudaoResponse.class, new HttpBack<YoudaoResponse>() {
+            @Override
+            public void loadSucceed(YoudaoResponse result) {
+                if (null != result && result.getErrorCode() == 0) {
+                    YoudaoResponse.BasicBean item = result.getBasic();
+                    String t = "";
+                    if (null != item) {
+                        for (int i = 0; i < item.getExplains().size(); i++) {
+                            t = t + item.getExplains().get(i) + ";";
+                        }
+                        AlertDialog.display(word, result.getQuery() + "  [" + item.getPhonetic() + "]: " + "\n" + t, "确定");
+                    } else {
+//                        baseToast.showToast("没查到该词");
+                    }
+                } else {
+//                    baseToast.showToast("没查到该词");
+                }
+            }
+
+            @Override
+            public void loadFailed(String error) {
+
+            }
+        });
+    }
+
     private void toPage(int page) {
         if (page < 0) {
             page = 0;
@@ -140,13 +174,13 @@ public class ReadController extends BaseController implements Initializable {
 
     private void nextPage() {
         if (currentPosition < paths.size() - 1) {
-            toPage(currentPosition+1);
+            toPage(currentPosition + 1);
         }
     }
 
     private void previousPage() {
         if (currentPosition > 0) {
-            toPage(currentPosition-1);
+            toPage(currentPosition - 1);
         }
     }
 
