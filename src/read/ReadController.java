@@ -15,6 +15,8 @@ import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 import base.BaseController;
+import dialog.AlertDialog;
+import dialog.EditDialog;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -25,6 +27,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import listener.EditResultListener;
 import spider.FileSpider;
 import utils.TextUtils;
 
@@ -67,7 +70,16 @@ public class ReadController extends BaseController implements Initializable {
         mIv.setImage(new Image(paths.get(currentPosition)));
         currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
         jumpMi.setOnAction(event -> {
-
+            EditDialog.display("跳转到", "请输入跳转位置(页码)", "确定", new EditResultListener() {
+                @Override
+                public void onResult(String result) {
+                    try {
+                        toPage(Integer.valueOf(result)-1);
+                    }catch (NumberFormatException e){
+                        AlertDialog.display("错误","请输入数字,并且是整数!","知道了");
+                    }
+                }
+            });
         });
         mScrollPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -113,21 +125,28 @@ public class ReadController extends BaseController implements Initializable {
         });
     }
 
+    private void toPage(int page) {
+        if (page < 0) {
+            page = 0;
+        }
+        if (page > paths.size() - 1) {
+            page = paths.size() - 1;
+        }
+        currentPosition = page;
+        mIv.setImage(new Image(paths.get(currentPosition)));
+        currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
+        saveProgress();
+    }
+
     private void nextPage() {
         if (currentPosition < paths.size() - 1) {
-            currentPosition++;
-            mIv.setImage(new Image(paths.get(currentPosition)));
-            currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
-            saveProgress();
+            toPage(currentPosition+1);
         }
     }
 
     private void previousPage() {
         if (currentPosition > 0) {
-            currentPosition--;
-            mIv.setImage(new Image(paths.get(currentPosition)));
-            currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
-            saveProgress();
+            toPage(currentPosition-1);
         }
     }
 
