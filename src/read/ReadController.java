@@ -21,6 +21,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import spider.FileSpider;
 import utils.TextUtils;
@@ -35,7 +36,7 @@ public class ReadController extends BaseController implements Initializable {
     private Clipboard mClipboard;
     private ArrayList<String> paths = new ArrayList<>();
     private int currentPosition = 0;
-    private   Preferences mPreferences;
+    private Preferences mPreferences;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -47,7 +48,7 @@ public class ReadController extends BaseController implements Initializable {
     public void setPath(String url) {
         path = url;
         title = url.substring(url.lastIndexOf("\\") + 1);
-        stage.setTitle(title);
+        stage.setTitle(url);
 
         receiveProgress();
         paths = FileSpider.getInstance().getMangaDetail(url);
@@ -79,19 +80,9 @@ public class ReadController extends BaseController implements Initializable {
                     event.consume();
                     currentInput += " ";
                 } else if (event.getCode().toString().equals("RIGHT")) {
-                    if (currentPosition < paths.size() - 1) {
-                        currentPosition++;
-                        mIv.setImage(new Image(paths.get(currentPosition)));
-                        currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
-                        saveProgress();
-                    }
+                    nextPage();
                 } else if (event.getCode().toString().equals("LEFT")) {
-                    if (currentPosition > 0) {
-                        currentPosition--;
-                        mIv.setImage(new Image(paths.get(currentPosition)));
-                        currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
-                        saveProgress();
-                    }
+                    previousPage();
                 }
                 if (TextUtils.isEmpty(currentInput)) {
                     currentInputLb.setText("输入单词");
@@ -100,6 +91,35 @@ public class ReadController extends BaseController implements Initializable {
                 }
             }
         });
+        mScrollPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                System.out.println(event.getX() + "\n" + event.getSceneX() + "\n" + event.getScreenX() + "\n" + mScrollPane.getWidth());
+                if (event.getSceneX()<(mScrollPane.getWidth()/2)){
+                    previousPage();
+                }else {
+                    nextPage();
+                }
+            }
+        });
+    }
+
+    private void nextPage() {
+        if (currentPosition < paths.size() - 1) {
+            currentPosition++;
+            mIv.setImage(new Image(paths.get(currentPosition)));
+            currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
+            saveProgress();
+        }
+    }
+
+    private void previousPage() {
+        if (currentPosition > 0) {
+            currentPosition--;
+            mIv.setImage(new Image(paths.get(currentPosition)));
+            currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
+            saveProgress();
+        }
     }
 
     //TODO
