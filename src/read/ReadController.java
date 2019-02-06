@@ -96,7 +96,6 @@ public class ReadController extends BaseController implements Initializable {
             public void handle(MouseEvent event) {
                 double result=mScrollPane.getWidth()/2;
                 double threshold=mIv.getImage().getWidth()/2;
-                System.out.println(event.getButton()+"");
                 if (event.getSceneX()<(result)&&event.getSceneX()>(result-threshold)&&event.getButton().toString().equals("PRIMARY")){
                     previousPage();
                 }else if (event.getSceneX()>(result)&&event.getSceneX()<(result+threshold)&&event.getButton().toString().equals("PRIMARY")){

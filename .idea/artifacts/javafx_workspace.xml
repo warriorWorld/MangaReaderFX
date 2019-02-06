@@ -1,0 +1,21 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="javafx_workspace">
+    <output-path>$PROJECT_DIR$/out/artifacts/javafx_workspace</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="sample.Main" />
+        <option name="description" value="" />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="nativeBundle" value="all" />
+        <option name="title" value="MangaReaderFx" />
+        <option name="vendor" value="" />
+        <option name="version" value="" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="javafx_workspace.jar">
+        <element id="module-output" name="javafx_workspace" />
+      </element>
+    </root>
+  </artifact>
+</component>

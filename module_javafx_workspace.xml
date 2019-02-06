@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_javafx_workspace" default="compile.module.javafx_workspace">
+  <dirname property="module.javafx_workspace.basedir" file="${ant.file.module_javafx_workspace}"/>
+  
+  <property name="module.jdk.home.javafx_workspace" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.javafx_workspace" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.javafx_workspace" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.javafx_workspace" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="javafx_workspace.output.dir" value="${module.javafx_workspace.basedir}/out/production/javafx_workspace"/>
+  <property name="javafx_workspace.testoutput.dir" value="${module.javafx_workspace.basedir}/out/test/javafx_workspace"/>
+  
+  <path id="javafx_workspace.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="javafx_workspace.module.production.classpath">
+    <path refid="${module.jdk.classpath.javafx_workspace}"/>
+    <pathelement location="${basedir}/../../开发资源/jsoup-1.11.3.jar"/>
+  </path>
+  
+  <path id="javafx_workspace.runtime.production.module.classpath">
+    <pathelement location="${javafx_workspace.output.dir}"/>
+    <pathelement location="${basedir}/../../开发资源/jsoup-1.11.3.jar"/>
+  </path>
+  
+  <path id="javafx_workspace.module.classpath">
+    <path refid="${module.jdk.classpath.javafx_workspace}"/>
+    <pathelement location="${javafx_workspace.output.dir}"/>
+    <pathelement location="${basedir}/../../开发资源/jsoup-1.11.3.jar"/>
+  </path>
+  
+  <path id="javafx_workspace.runtime.module.classpath">
+    <pathelement location="${javafx_workspace.testoutput.dir}"/>
+    <pathelement location="${javafx_workspace.output.dir}"/>
+    <pathelement location="${basedir}/../../开发资源/jsoup-1.11.3.jar"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.javafx_workspace">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.javafx_workspace">
+    <patternset refid="excluded.from.module.javafx_workspace"/>
+  </patternset>
+  
+  <path id="javafx_workspace.module.sourcepath">
+    <dirset dir="${module.javafx_workspace.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.javafx_workspace" depends="compile.module.javafx_workspace.production,compile.module.javafx_workspace.tests" description="Compile module javafx_workspace"/>
+  
+  <target name="compile.module.javafx_workspace.production" depends="register.custom.compilers" description="Compile module javafx_workspace; production classes">
+    <mkdir dir="${javafx_workspace.output.dir}"/>
+    <javac2 destdir="${javafx_workspace.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.javafx_workspace}/javac">
+      <compilerarg line="${compiler.args.javafx_workspace}"/>
+      <bootclasspath refid="javafx_workspace.module.bootclasspath"/>
+      <classpath refid="javafx_workspace.module.production.classpath"/>
+      <src refid="javafx_workspace.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.javafx_workspace"/>
+    </javac2>
+    
+    <copy todir="${javafx_workspace.output.dir}">
+      <fileset dir="${module.javafx_workspace.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.javafx_workspace.tests" depends="register.custom.compilers,compile.module.javafx_workspace.production" description="compile module javafx_workspace; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.javafx_workspace" description="cleanup module">
+    <delete dir="${javafx_workspace.output.dir}"/>
+    <delete dir="${javafx_workspace.testoutput.dir}"/>
+  </target>
+</project>
