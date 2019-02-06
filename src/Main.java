@@ -38,6 +38,7 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root, 800, 500));
         primaryStage.show();
         controller.setStage(primaryStage);
+        controller.setPath("E:\\Manga\\testmanga");
     }
 
     /**

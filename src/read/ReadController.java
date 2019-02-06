@@ -11,36 +11,46 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-
+import java.util.prefs.Preferences;
 
 import base.BaseController;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import spider.FileSpider;
 import utils.TextUtils;
 
 public class ReadController extends BaseController implements Initializable {
+    private String path, title;
     private org.jsoup.nodes.Document doc;
     public ImageView mIv;
     public ScrollPane mScrollPane;
-    public Label currentInputLb,currentPageLb;
+    public Label currentInputLb, currentPageLb;
     private String currentInput = "";
     private Clipboard mClipboard;
     private ArrayList<String> paths = new ArrayList<>();
     private int currentPosition = 0;
+    private   Preferences mPreferences;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        //这个会比main的start调用还早
         mClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        paths = FileSpider.getInstance().getMangaDetail("E:\\Manga\\testmanga");
+        mPreferences = Preferences.userRoot();
+    }
+
+    public void setPath(String url) {
+        path = url;
+        title = url.substring(url.lastIndexOf("\\") + 1);
+        stage.setTitle(title);
+
+        receiveProgress();
+        paths = FileSpider.getInstance().getMangaDetail(url);
         initUI();
     }
 
@@ -53,7 +63,7 @@ public class ReadController extends BaseController implements Initializable {
     private void initUI() {
         mIv.setPreserveRatio(true);
         mIv.setImage(new Image(paths.get(currentPosition)));
-        currentPageLb.setText((currentPosition+1)+"/"+paths.size());
+        currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
         mScrollPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -72,13 +82,15 @@ public class ReadController extends BaseController implements Initializable {
                     if (currentPosition < paths.size() - 1) {
                         currentPosition++;
                         mIv.setImage(new Image(paths.get(currentPosition)));
-                        currentPageLb.setText((currentPosition+1)+"/"+paths.size());
+                        currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
+                        saveProgress();
                     }
                 } else if (event.getCode().toString().equals("LEFT")) {
                     if (currentPosition > 0) {
                         currentPosition--;
                         mIv.setImage(new Image(paths.get(currentPosition)));
-                        currentPageLb.setText((currentPosition+1)+"/"+paths.size());
+                        currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
+                        saveProgress();
                     }
                 }
                 if (TextUtils.isEmpty(currentInput)) {
@@ -90,8 +102,17 @@ public class ReadController extends BaseController implements Initializable {
         });
     }
 
+    //TODO
     public void handleZoom() {
         System.out.println("handle zoom");
+    }
+
+    private void saveProgress() {
+        mPreferences.putInt(path + "lastReadPosition", currentPosition);
+    }
+
+    private void receiveProgress() {
+        currentPosition = mPreferences.getInt(path + "lastReadPosition", 0);
     }
 
     private void jsoup() {
