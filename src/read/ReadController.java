@@ -1,6 +1,7 @@
 package read;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -28,7 +29,6 @@ import utils.TextUtils;
 
 public class ReadController extends BaseController implements Initializable {
     private String path, title;
-    private org.jsoup.nodes.Document doc;
     public ImageView mIv;
     public ScrollPane mScrollPane;
     public Label currentInputLb, currentPageLb;
@@ -40,7 +40,6 @@ public class ReadController extends BaseController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //这个会比main的start调用还早
         mClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         mPreferences = Preferences.userRoot();
     }
@@ -75,7 +74,9 @@ public class ReadController extends BaseController implements Initializable {
                     mClipboard.setContents(new StringSelection(currentInput), null);
                     currentInput = "";
                 } else if (event.getCode().toString().equals("BACK_SPACE")) {
-                    currentInput = currentInput.substring(0, currentInput.length() - 1);
+                    if (currentInput.length()>0) {
+                        currentInput = currentInput.substring(0, currentInput.length() - 1);
+                    }
                 } else if (event.getCode().toString().equals("SPACE")) {
                     event.consume();
                     currentInput += " ";
@@ -83,6 +84,8 @@ public class ReadController extends BaseController implements Initializable {
                     nextPage();
                 } else if (event.getCode().toString().equals("LEFT")) {
                     previousPage();
+                }else if (event.getCode().toString().equals("DELETE")) {
+                    jsoup();
                 }
                 if (TextUtils.isEmpty(currentInput)) {
                     currentInputLb.setText("输入单词");
@@ -94,11 +97,11 @@ public class ReadController extends BaseController implements Initializable {
         mScrollPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                double result=mScrollPane.getWidth()/2;
-                double threshold=mIv.getImage().getWidth()/2;
-                if (event.getSceneX()<(result)&&event.getSceneX()>(result-threshold)&&event.getButton().toString().equals("PRIMARY")){
+                double result = mScrollPane.getWidth() / 2;
+                double threshold = mIv.getImage().getWidth() / 2;
+                if (event.getSceneX() < (result) && event.getSceneX() > (result - threshold) && event.getButton().toString().equals("PRIMARY")) {
                     previousPage();
-                }else if (event.getSceneX()>(result)&&event.getSceneX()<(result+threshold)&&event.getButton().toString().equals("PRIMARY")){
+                } else if (event.getSceneX() > (result) && event.getSceneX() < (result + threshold) && event.getButton().toString().equals("PRIMARY")) {
                     nextPage();
                 }
             }
@@ -137,6 +140,7 @@ public class ReadController extends BaseController implements Initializable {
     }
 
     private void jsoup() {
+        Document doc=null;
         try {
             doc = Jsoup.connect("http://jandan.net/duan/page-91#comments")
                     .timeout(10000).get();
@@ -154,6 +158,7 @@ public class ReadController extends BaseController implements Initializable {
 //                System.out.println(ele.select("div.text").text());
                 result += ele.select("div.text").text() + "\n";
             }
+            currentPageLb.setText(result);
         }
     }
 }

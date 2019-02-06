@@ -15,6 +15,7 @@
     <root id="root">
       <element id="archive" name="javafx_workspace.jar">
         <element id="module-output" name="javafx_workspace" />
+        <element id="file-copy" path="$PROJECT_DIR$/libs/jsoup-1.11.3.jar" />
       </element>
     </root>
   </artifact>
