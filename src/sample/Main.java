@@ -14,7 +14,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
 //        Parent root = FXMLLoader.load(getClass().getResource("read\\read.fxml"));
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/read/read.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/read.fxml"));
         Parent root = fxmlLoader.load();
         //如果使用 Parent root = FXMLLoader.load(...) 静态读取方法，无法获取到Controller的实例对象
         ReadController controller = fxmlLoader.getController(); //获取Controller的实例对象

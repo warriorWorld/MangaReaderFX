@@ -18,6 +18,7 @@ import base.BaseController;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -32,6 +33,7 @@ public class ReadController extends BaseController implements Initializable {
     public ImageView mIv;
     public ScrollPane mScrollPane;
     public Label currentInputLb, currentPageLb;
+    public MenuItem jumpMi;
     private String currentInput = "";
     private Clipboard mClipboard;
     private ArrayList<String> paths = new ArrayList<>();
@@ -64,6 +66,9 @@ public class ReadController extends BaseController implements Initializable {
         mIv.setPreserveRatio(true);
         mIv.setImage(new Image(paths.get(currentPosition)));
         currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
+        jumpMi.setOnAction(event -> {
+
+        });
         mScrollPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -74,7 +79,7 @@ public class ReadController extends BaseController implements Initializable {
                     mClipboard.setContents(new StringSelection(currentInput), null);
                     currentInput = "";
                 } else if (event.getCode().toString().equals("BACK_SPACE")) {
-                    if (currentInput.length()>0) {
+                    if (currentInput.length() > 0) {
                         currentInput = currentInput.substring(0, currentInput.length() - 1);
                     }
                 } else if (event.getCode().toString().equals("SPACE")) {
@@ -84,7 +89,7 @@ public class ReadController extends BaseController implements Initializable {
                     nextPage();
                 } else if (event.getCode().toString().equals("LEFT")) {
                     previousPage();
-                }else if (event.getCode().toString().equals("DELETE")) {
+                } else if (event.getCode().toString().equals("DELETE")) {
                     jsoup();
                 }
                 if (TextUtils.isEmpty(currentInput)) {
@@ -140,7 +145,7 @@ public class ReadController extends BaseController implements Initializable {
     }
 
     private void jsoup() {
-        Document doc=null;
+        Document doc = null;
         try {
             doc = Jsoup.connect("http://jandan.net/duan/page-91#comments")
                     .timeout(10000).get();

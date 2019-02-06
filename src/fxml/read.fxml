@@ -39,7 +39,7 @@
             <items>
                   <MenuItem mnemonicParsing="false" text="后退" />
               <MenuItem mnemonicParsing="false" text="设置文件地址" />
-                  <MenuItem mnemonicParsing="false" text="跳转" />
+                  <MenuItem fx:id="jumpMi" mnemonicParsing="false" text="跳转" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="编辑">
