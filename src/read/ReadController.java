@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 
+import base.BaseController;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -22,14 +23,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
 import spider.FileSpider;
 import utils.TextUtils;
 
-public class ReadController implements Initializable {
+public class ReadController extends BaseController implements Initializable {
     private org.jsoup.nodes.Document doc;
     public ImageView mIv;
     public ScrollPane mScrollPane;
-    public Label currentInputLb;
+    public Label currentInputLb,currentPageLb;
     private String currentInput = "";
     private Clipboard mClipboard;
     private ArrayList<String> paths = new ArrayList<>();
@@ -42,15 +44,22 @@ public class ReadController implements Initializable {
         initUI();
     }
 
+    @Override
+    public void setStage(Stage stage) {
+        super.setStage(stage);
+        stage.setTitle("具体漫画名称");
+    }
+
     private void initUI() {
         mIv.setPreserveRatio(true);
         mIv.setImage(new Image(paths.get(currentPosition)));
+        currentPageLb.setText((currentPosition+1)+"/"+paths.size());
         mScrollPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
                 System.out.println(event.getCode());
                 if (event.getCode().toString().length() == 1) {
-                    currentInput += event.getCode().toString();
+                    currentInput += event.getCode().toString().toLowerCase();
                 } else if (event.getCode().toString().equals("ENTER")) {
                     mClipboard.setContents(new StringSelection(currentInput), null);
                     currentInput = "";
@@ -60,14 +69,16 @@ public class ReadController implements Initializable {
                     event.consume();
                     currentInput += " ";
                 } else if (event.getCode().toString().equals("RIGHT")) {
-                    if (currentPosition < paths.size() - 2) {
+                    if (currentPosition < paths.size() - 1) {
                         currentPosition++;
                         mIv.setImage(new Image(paths.get(currentPosition)));
+                        currentPageLb.setText((currentPosition+1)+"/"+paths.size());
                     }
                 } else if (event.getCode().toString().equals("LEFT")) {
-                    if (currentPosition >0) {
+                    if (currentPosition > 0) {
                         currentPosition--;
                         mIv.setImage(new Image(paths.get(currentPosition)));
+                        currentPageLb.setText((currentPosition+1)+"/"+paths.size());
                     }
                 }
                 if (TextUtils.isEmpty(currentInput)) {

@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.StackPane?>
 
-<BorderPane prefHeight="720.0" prefWidth="906.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="read.ReadController">
+<BorderPane prefHeight="901.0" prefWidth="1314.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="read.ReadController">
    <center>
       <ScrollPane fx:id="mScrollPane" fitToHeight="true" fitToWidth="true" prefHeight="671.0" prefWidth="896.0" BorderPane.alignment="CENTER">
          <content>
@@ -21,7 +21,7 @@
                         <ImageView fx:id="mIv" onScroll="#handleZoom" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER" />
                      </children>
                   </StackPane>
-                  <Label text="Label" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+                  <Label fx:id="currentPageLb" text="page" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0" />
                   <Label fx:id="currentInputLb" text="输入单词" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
                </children>
             </AnchorPane>
