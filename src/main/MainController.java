@@ -1,11 +1,14 @@
 package main;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import base.BaseController;
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -25,9 +28,16 @@ public class MainController extends BaseController implements Initializable {
     public PasswordField mPasswordField;
     public StackPane mStackPane;
     public Label userNameLb;
+    private Parent optionsRoot;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/options.fxml"));
+            optionsRoot = fxmlLoader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         initUI();
     }
 
@@ -37,9 +47,18 @@ public class MainController extends BaseController implements Initializable {
         menuLv.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if (event.getButton().toString().equals("PRIMARY")){
-                    userNameLb.setText(menuLv.getSelectionModel().getSelectedIndex()+"");
+
+                if (event.getButton().toString().equals("PRIMARY")) {
+                    switch (menuLv.getSelectionModel().getSelectedIndex()) {
+                        case 8:
+                            if (!mStackPane.getChildren().equals(optionsRoot)) {
+                                mStackPane.getChildren().clear();
+                                mStackPane.getChildren().add(optionsRoot);
+                            }
+                            break;
+                    }
                 }
+
             }
         });
     }
