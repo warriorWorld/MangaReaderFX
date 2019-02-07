@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import base.BaseController;
+import dialog.AlertDialog;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -24,6 +25,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import listener.OnItemClickListener;
 import mangalist.ItemMangaController;
 import read.ReadController;
 
@@ -174,8 +176,14 @@ public class MainController extends BaseController implements Initializable {
                 FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("/fxml/item_manga_list.fxml"));
                 Parent item = fxmlLoader1.load();
                 ItemMangaController itemController = fxmlLoader1.getController();
-                itemController.setMangaThumbil("http://ws3.sinaimg.cn/mw600/007Bhwjoly1fzxn5zfgoij30y019c1kx.jpg");
+                itemController.setMangaThumbil("http://ww3.sinaimg.cn/mw600/0073tLPGgy1fzxpppoklzj30u0140e81.jpg");
                 itemController.setMangaName("在线漫画");
+                itemController.setOnClickListener(i, new OnItemClickListener() {
+                    @Override
+                    public void onClick(int position) {
+                        AlertDialog.display(position+"","ddsad","ddd");
+                    }
+                });
                 onlineGrid.add(item, (i % column), (int) (i / column));
             }
         } catch (IOException e) {
