@@ -1,6 +1,7 @@
 package spider;
 
-import listener.SpiderCallBack;
+
+import listener.JsoupCallBack;
 
 /**
  * Created by Administrator on 2017/7/18.
@@ -16,9 +17,9 @@ public abstract class SpiderBase {
         BY_GRADE
     }
 
-    public abstract <ResultObj> void getMangaList(String type, String page, final SpiderCallBack<ResultObj> spiderCallBack);
+    public abstract <ResultObj> void getMangaList(String type, String page, final JsoupCallBack<ResultObj> spiderCallBack);
 
-    public abstract <ResultObj> void getMangaDetail(final String mangaURL, final SpiderCallBack<ResultObj> spiderCallBack);
+    public abstract <ResultObj> void getMangaDetail(final String mangaURL, final JsoupCallBack<ResultObj> spiderCallBack);
 
     public abstract boolean isOneShot();
 
@@ -27,9 +28,9 @@ public abstract class SpiderBase {
     public abstract String[] getMangaTypeCodes();
 
     public abstract <ResultObj> void getMangaChapterPics
-            (final String chapterUrl, final SpiderCallBack<ResultObj> spiderCallBack);
+            (final String chapterUrl, final JsoupCallBack<ResultObj> spiderCallBack);
 
-    public abstract <ResultObj> void getSearchResultList(SearchType type, String keyWord, final SpiderCallBack<ResultObj> spiderCallBack);
+    public abstract <ResultObj> void getSearchResultList(SearchType type, String keyWord, final JsoupCallBack<ResultObj> spiderCallBack);
 
     //很多网页的下一页并不是在网址后+1 而是+n
     public abstract int nextPageNeedAddCount();

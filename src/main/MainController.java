@@ -2,9 +2,12 @@ package main;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import base.BaseController;
+import bean.MangaBean;
+import bean.MangaListBean;
 import dialog.AlertDialog;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -25,9 +28,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import listener.JsoupCallBack;
 import listener.OnItemClickListener;
 import mangalist.ItemMangaController;
 import read.ReadController;
+import spider.SpiderBase;
 
 public class MainController extends BaseController implements Initializable {
     public ListView menuLv;
@@ -45,6 +50,8 @@ public class MainController extends BaseController implements Initializable {
     public Button previousBtn;
     public Button nextBtn;
     public TextField pageTf;
+    private ArrayList<MangaBean> currentMangaList = new ArrayList<>();
+    private SpiderBase spider;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -56,6 +63,19 @@ public class MainController extends BaseController implements Initializable {
             e.printStackTrace();
         }
         initUI();
+        initSpider("KaKaLot");
+    }
+
+    private void initSpider(String spiderName) {
+        try {
+            spider = (SpiderBase) Class.forName("spider." + spiderName + "Spider").newInstance();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initUI() {
@@ -156,7 +176,29 @@ public class MainController extends BaseController implements Initializable {
     @Override
     public void setScene(Scene scene) {
         super.setScene(scene);
-        initOnlineList();
+        doGetData(1);
+    }
+
+    private void doGetData(int page) {
+        spider.getMangaList("all",
+                page + "", new JsoupCallBack<MangaListBean>() {
+                    @Override
+                    public void loadSucceed(final MangaListBean result) {
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                currentMangaList = result.getMangaList();
+//                                ShareObjUtil.saveObject(getActivity(), currentMangaList, ShareKeys.MAIN_PAGE_CHCHE);
+                                initOnlineList();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void loadFailed(String error) {
+                        AlertDialog.display("错误", error, "确定");
+                    }
+                });
     }
 
     private void initOnlinePaneUI() {
@@ -172,16 +214,17 @@ public class MainController extends BaseController implements Initializable {
         try {
             int width = (int) (scene.getWidth() - menuLv.getWidth());
             int column = (int) (width / 200) - 1;
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < currentMangaList.size(); i++) {
                 FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("/fxml/item_manga_list.fxml"));
                 Parent item = fxmlLoader1.load();
                 ItemMangaController itemController = fxmlLoader1.getController();
-                itemController.setMangaThumbil("http://ww3.sinaimg.cn/mw600/0073tLPGgy1fzxpppoklzj30u0140e81.jpg");
-                itemController.setMangaName("在线漫画");
+                MangaBean mangaItem=currentMangaList.get(i);
+                itemController.setMangaThumbil(mangaItem.getWebThumbnailUrl());
+                itemController.setMangaName(mangaItem.getName());
                 itemController.setOnClickListener(i, new OnItemClickListener() {
                     @Override
                     public void onClick(int position) {
-                        AlertDialog.display(position+"","ddsad","ddd");
+                        AlertDialog.display(position + "", mangaItem.getUrl(), "ddd");
                     }
                 });
                 onlineGrid.add(item, (i % column), (int) (i / column));

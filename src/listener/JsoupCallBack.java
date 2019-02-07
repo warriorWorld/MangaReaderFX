@@ -1,7 +1,7 @@
 package listener;
 
 
-public interface SpiderCallBack<ResultObj> {
+public interface JsoupCallBack<ResultObj> {
     /**
      * 请求数据成功之后的回调
      * <p>
