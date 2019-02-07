@@ -52,6 +52,7 @@ public class MainController extends BaseController implements Initializable {
     public TextField pageTf;
     private ArrayList<MangaBean> currentMangaList = new ArrayList<>();
     private SpiderBase spider;
+    private int currentPage = 1;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -144,6 +145,18 @@ public class MainController extends BaseController implements Initializable {
                     }
                 }
             });
+            nextBtn.setOnAction(event -> {
+                currentPage++;
+                pageTf.setText(currentPage + "");
+                doGetData(currentPage);
+            });
+            previousBtn.setOnAction(event -> {
+                if (currentPage>1) {
+                    currentPage--;
+                    pageTf.setText(currentPage + "");
+                    doGetData(currentPage);
+                }
+            });
 
             toggleContent(0);
         } catch (Exception e) {
@@ -212,13 +225,14 @@ public class MainController extends BaseController implements Initializable {
 
     private void initOnlineList() {
         try {
+            onlineGrid.getChildren().clear();
             int width = (int) (scene.getWidth() - menuLv.getWidth());
             int column = (int) (width / 200) - 1;
             for (int i = 0; i < currentMangaList.size(); i++) {
                 FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("/fxml/item_manga_list.fxml"));
                 Parent item = fxmlLoader1.load();
                 ItemMangaController itemController = fxmlLoader1.getController();
-                MangaBean mangaItem=currentMangaList.get(i);
+                MangaBean mangaItem = currentMangaList.get(i);
                 itemController.setMangaThumbil(mangaItem.getWebThumbnailUrl());
                 itemController.setMangaName(mangaItem.getName());
                 itemController.setOnClickListener(i, new OnItemClickListener() {
