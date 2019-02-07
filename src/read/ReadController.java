@@ -20,6 +20,8 @@ import bean.YoudaoResponse;
 import configure.Configure;
 import dialog.AlertDialog;
 import dialog.EditDialog;
+import enums.SourceType;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -31,9 +33,12 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import listener.EditResultListener;
+import listener.JsoupCallBack;
 import okhttp.HttpBack;
 import okhttp.HttpService;
 import spider.FileSpider;
+import spider.SpiderBase;
+import utils.ImgUtil;
 import utils.TextUtils;
 
 public class ReadController extends BaseController implements Initializable {
@@ -47,22 +52,15 @@ public class ReadController extends BaseController implements Initializable {
     private ArrayList<String> paths = new ArrayList<>();
     private int currentPosition = 0;
     private Preferences mPreferences;
+    private SourceType mSourceType;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         mClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         mPreferences = Preferences.userRoot();
-    }
-
-    public void setPath(String url) {
-        path = url;
-        title = url.substring(url.lastIndexOf("\\") + 1);
-        stage.setTitle(url);
-
-        receiveProgress();
-        paths = FileSpider.getInstance().getMangaDetail(url);
         initUI();
     }
+
 
     @Override
     public void setStage(Stage stage) {
@@ -72,8 +70,6 @@ public class ReadController extends BaseController implements Initializable {
 
     private void initUI() {
         mIv.setPreserveRatio(true);
-        mIv.setImage(new Image(paths.get(currentPosition)));
-        currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
         jumpMi.setOnAction(event -> {
             EditDialog.display("跳转到", "请输入跳转位置(页码)", "确定", new EditResultListener() {
                 @Override
@@ -167,7 +163,31 @@ public class ReadController extends BaseController implements Initializable {
             page = paths.size() - 1;
         }
         currentPosition = page;
-        mIv.setImage(new Image(paths.get(currentPosition)));
+        switch (mSourceType) {
+            case LOCAL:
+                mIv.setImage(new Image(paths.get(currentPosition)));
+                break;
+            case ONLINE:
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            final Image image;
+                            image = ImgUtil.createImage(paths.get(currentPosition));
+
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mIv.setImage(image);
+                                }
+                            });
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+                break;
+        }
         currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
         saveProgress();
     }
@@ -195,6 +215,43 @@ public class ReadController extends BaseController implements Initializable {
 
     private void receiveProgress() {
         currentPosition = mPreferences.getInt(path + "lastReadPosition", 0);
+    }
+
+    public void setLocalPath(String url) {
+        mSourceType = SourceType.LOCAL;
+        path = url;
+        title = url.substring(url.lastIndexOf("\\") + 1);
+        stage.setTitle(title);
+
+        receiveProgress();
+        paths = FileSpider.getInstance().getMangaDetail(url);
+        toPage(currentPosition);
+    }
+
+    public void setOnlinePath(String url, String mangaName, SpiderBase spider) {
+        mSourceType = SourceType.ONLINE;
+        path = url;
+        title = mangaName;
+        stage.setTitle(title);
+
+        receiveProgress();
+        spider.getMangaChapterPics(url, new JsoupCallBack<ArrayList<String>>() {
+            @Override
+            public void loadSucceed(final ArrayList<String> result) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        paths = result;
+                        toPage(currentPosition);
+                    }
+                });
+            }
+
+            @Override
+            public void loadFailed(String error) {
+                AlertDialog.display("错误", error, "确定");
+            }
+        });
     }
 
     private void jsoup() {

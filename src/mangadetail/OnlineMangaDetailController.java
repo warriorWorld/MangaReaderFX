@@ -34,6 +34,7 @@ public class OnlineMangaDetailController extends BaseController implements Initi
     public GridPane chapterGp;
     private MangaBean currentManga;
     private int stackPaneWidth = 0;
+    private SpiderBase spider;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -41,6 +42,7 @@ public class OnlineMangaDetailController extends BaseController implements Initi
     }
 
     public void setUrl(String url, SpiderBase spider) {
+        this.spider=spider;
         spider.getMangaDetail(url, new JsoupCallBack<MangaBean>() {
             @Override
             public void loadSucceed(final MangaBean result) {
@@ -105,13 +107,13 @@ public class OnlineMangaDetailController extends BaseController implements Initi
             ChapterBean item = currentManga.getChapters().get(i);
             button.setText("第" + item.getChapterPosition() + "话");
             button.setOnAction(event -> {
-                openReadManga();
+                openReadManga(item.getChapterUrl());
             });
             chapterGp.add(button, (i % column), (int) (i / column));
         }
     }
 
-    private void openReadManga() {
+    private void openReadManga(String url) {
         try {
             Stage window = new Stage();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/read.fxml"));
@@ -126,7 +128,7 @@ public class OnlineMangaDetailController extends BaseController implements Initi
             window.show();
             controller.setStage(window);
             controller.setScene(scene);
-            controller.setPath("E:\\Manga\\testmanga");
+            controller.setOnlinePath(url,currentManga.getName(),spider);
         } catch (Exception e) {
             e.printStackTrace();
         }
