@@ -202,7 +202,6 @@ public class MainController extends BaseController implements Initializable {
                 mStackPane.getChildren().add(onlineScrollPane);
                 break;
             case 6:
-                openReadManga();
                 break;
             case 8:
                 mStackPane.getChildren().clear();
@@ -281,27 +280,6 @@ public class MainController extends BaseController implements Initializable {
                 onlineGrid.add(item, (i % column), (int) (i / column));
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void openReadManga() {
-        try {
-            Stage window = new Stage();
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/read.fxml"));
-            Parent root = fxmlLoader.load();
-            //如果使用 Parent root = FXMLLoader.load(...) 静态读取方法，无法获取到Controller的实例对象
-            ReadController controller = fxmlLoader.getController(); //获取Controller的实例对象
-            Scene scene = new Scene(root, 800, 500);
-
-            window.setTitle("英文漫画阅读器");
-            window.setMaximized(true);
-            window.setScene(scene);
-            window.show();
-            controller.setStage(window);
-            controller.setScene(scene);
-            controller.setPath("E:\\Manga\\testmanga");
-        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -13,14 +13,17 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 import listener.JsoupCallBack;
 import listener.OnItemClickListener;
 import mangalist.ItemMangaController;
+import read.ReadController;
 import spider.SpiderBase;
 import utils.ImgUtil;
 
@@ -95,16 +98,37 @@ public class OnlineMangaDetailController extends BaseController implements Initi
 
     private void initGridView() {
         chapterGp.getChildren().clear();
-        int column = (int) (stackPaneWidth/ 90);
+        int column = (int) (stackPaneWidth / 90);
         for (int i = 0; i < currentManga.getChapters().size(); i++) {
             Button button = new Button();
             button.setPrefWidth(90);
             ChapterBean item = currentManga.getChapters().get(i);
             button.setText("第" + item.getChapterPosition() + "话");
             button.setOnAction(event -> {
-                AlertDialog.display("tit", item.getChapterUrl(), "ddd");
+                openReadManga();
             });
             chapterGp.add(button, (i % column), (int) (i / column));
+        }
+    }
+
+    private void openReadManga() {
+        try {
+            Stage window = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/read.fxml"));
+            Parent root = fxmlLoader.load();
+            //如果使用 Parent root = FXMLLoader.load(...) 静态读取方法，无法获取到Controller的实例对象
+            ReadController controller = fxmlLoader.getController(); //获取Controller的实例对象
+            Scene scene = new Scene(root, 800, 500);
+
+            window.setTitle("英文漫画阅读器");
+            window.setMaximized(true);
+            window.setScene(scene);
+            window.show();
+            controller.setStage(window);
+            controller.setScene(scene);
+            controller.setPath("E:\\Manga\\testmanga");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
