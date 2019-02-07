@@ -16,6 +16,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import listener.OnClickListener;
 import listener.OnItemClickListener;
+import utils.ImgUtil;
 
 public class ItemMangaController extends BaseController implements Initializable {
     public ImageView mangaIv;
@@ -33,7 +34,7 @@ public class ItemMangaController extends BaseController implements Initializable
 //                Image image = new Image(img);
                 try {
                     final Image image;
-                    image = createImage(img);
+                    image = ImgUtil.createImage(img);
 
                     Platform.runLater(new Runnable() {
                         @Override
@@ -48,22 +49,7 @@ public class ItemMangaController extends BaseController implements Initializable
         }).start();
     }
 
-    /**
-     * 这不是https问题。看起来cdn.discordapp.com需要HTTP请求中的一个User-Agent头。此外，该网站似乎只接受用户代理的特定格式。原来，由wget供给被接受，用户代理：
-     *
-     * @param url
-     * @return
-     * @throws IOException
-     */
-    private Image createImage(String url)
-            throws IOException {
-        URLConnection conn = new URL(url).openConnection();
-        conn.setRequestProperty("User-Agent", "Wget/1.13.4 (linux-gnu)");
 
-        try (InputStream stream = conn.getInputStream()) {
-            return new Image(stream);
-        }
-    }
 
     public void setMangaName(String text) {
         mangaNameLb.setText(text);
