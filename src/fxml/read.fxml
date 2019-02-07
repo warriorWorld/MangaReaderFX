@@ -58,7 +58,7 @@
    <bottom>
       <HBox alignment="CENTER_LEFT" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="currentInputLb" text="输入单词" />
+            <Label fx:id="currentInputLb" text="直接输入单词或句子,然后回车即可翻译单词或句子." />
             <Region HBox.hgrow="ALWAYS" />
             <Label fx:id="currentPageLb" text="page" />
          </children>

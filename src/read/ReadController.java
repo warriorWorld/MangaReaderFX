@@ -26,6 +26,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -58,6 +59,7 @@ public class ReadController extends BaseController implements Initializable {
     private Preferences mPreferences;
     private SourceType mSourceType;
     private HashMap<Integer, Image> cacheList = new HashMap<>();
+    private int chapterPos = 0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -73,21 +75,10 @@ public class ReadController extends BaseController implements Initializable {
         stage.setTitle("具体漫画名称");
     }
 
-    private void initUI() {
-        mIv.setPreserveRatio(true);
-        jumpMi.setOnAction(event -> {
-            EditDialog.display("跳转到", "请输入跳转位置(页码)", "确定", new EditResultListener() {
-                @Override
-                public void onResult(String result) {
-                    try {
-                        toPage(Integer.valueOf(result) - 1);
-                    } catch (NumberFormatException e) {
-                        AlertDialog.display("错误", "请输入数字,并且是整数!", "知道了");
-                    }
-                }
-            });
-        });
-        mScrollPane.setOnKeyPressed(new EventHandler<KeyEvent>() {
+    @Override
+    public void setScene(Scene scene) {
+        super.setScene(scene);
+        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
                 System.out.println(event.getCode());
@@ -112,11 +103,27 @@ public class ReadController extends BaseController implements Initializable {
                     jsoup();
                 }
                 if (TextUtils.isEmpty(currentInput)) {
-                    currentInputLb.setText("输入单词");
+                    currentInputLb.setText("直接输入单词或句子,然后回车即可翻译单词或句子.");
                 } else {
                     currentInputLb.setText(currentInput);
                 }
             }
+        });
+    }
+
+    private void initUI() {
+        mIv.setPreserveRatio(true);
+        jumpMi.setOnAction(event -> {
+            EditDialog.display("跳转到", "请输入跳转位置(页码)", "确定", new EditResultListener() {
+                @Override
+                public void onResult(String result) {
+                    try {
+                        toPage(getCorrectPage(Integer.valueOf(result)) - 1);
+                    } catch (NumberFormatException e) {
+                        AlertDialog.display("错误", "请输入数字,并且是整数!", "知道了");
+                    }
+                }
+            });
         });
         mScrollPane.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
@@ -170,29 +177,28 @@ public class ReadController extends BaseController implements Initializable {
         });
     }
 
-    private void toPage(int page) {
-        if (page < 0) {
-            page = 0;
-        }
-        if (page > paths.size() - 1) {
-            page = paths.size() - 1;
-        }
+    private void toPage(final int page) {
+        stage.setTitle(title+"(加载中...)");
+        mScrollPane.setVvalue(0);
         currentPosition = page;
+        currentPageLb.setText((page + 1) + "/" + paths.size());
+        saveProgress();
         switch (mSourceType) {
             case LOCAL:
-                mIv.setImage(new Image(paths.get(currentPosition)));
+                mIv.setImage(new Image(paths.get(page)));
+                stage.setTitle(title);
                 break;
             case ONLINE:
                 if (page < paths.size() - 2) {
                     //预加载下一页
-                    if (null == cacheList.get(currentPosition + 1)) {
+                    if (null == cacheList.get(page + 1)) {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
                                 try {
                                     final Image image;
-                                    image = ImgUtil.createImage(paths.get(currentPosition + 1));
-                                    cacheList.put(currentPosition + 1, image);
+                                    image = ImgUtil.createImage(paths.get(page + 1));
+                                    cacheList.put(page + 1, image);
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
@@ -202,6 +208,7 @@ public class ReadController extends BaseController implements Initializable {
                 }
                 if (null != cacheList.get(page)) {
                     mIv.setImage(cacheList.get(page));
+                    stage.setTitle(title);
                     return;
                 }
                 new Thread(new Runnable() {
@@ -209,12 +216,15 @@ public class ReadController extends BaseController implements Initializable {
                     public void run() {
                         try {
                             final Image image;
-                            image = ImgUtil.createImage(paths.get(currentPosition));
-                            cacheList.put(currentPosition, image);
+                            image = ImgUtil.createImage(paths.get(page));
+                            cacheList.put(page, image);
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    mIv.setImage(image);
+                                    if (page==currentPosition) {
+                                        mIv.setImage(image);
+                                        stage.setTitle(title);
+                                    }
                                 }
                             });
                         } catch (IOException e) {
@@ -224,8 +234,6 @@ public class ReadController extends BaseController implements Initializable {
                 }).start();
                 break;
         }
-        currentPageLb.setText((currentPosition + 1) + "/" + paths.size());
-        saveProgress();
     }
 
     private void nextPage() {
@@ -240,17 +248,27 @@ public class ReadController extends BaseController implements Initializable {
         }
     }
 
+    private int getCorrectPage(int page) {
+        if (page < 0) {
+            page = 0;
+        }
+        if (page > paths.size() - 1) {
+            page = paths.size() - 1;
+        }
+        return page;
+    }
+
     //TODO
     public void handleZoom() {
         System.out.println("handle zoom");
     }
 
     private void saveProgress() {
-        mPreferences.putInt(path + "lastReadPosition", currentPosition);
+        mPreferences.putInt(title + chapterPos + "lastRead", currentPosition);
     }
 
     private void receiveProgress() {
-        currentPosition = mPreferences.getInt(path + "lastReadPosition", 0);
+        currentPosition = mPreferences.getInt(title + chapterPos + "lastRead", 0);
     }
 
     public void setLocalPath(String url) {
@@ -264,10 +282,11 @@ public class ReadController extends BaseController implements Initializable {
         toPage(currentPosition);
     }
 
-    public void setOnlinePath(String url, String mangaName, SpiderBase spider) {
+    public void setOnlinePath(String url, String mangaName, int chapterPosition, SpiderBase spider) {
         mSourceType = SourceType.ONLINE;
         path = url;
         title = mangaName;
+        chapterPos = chapterPosition;
         stage.setTitle(title);
 
         receiveProgress();

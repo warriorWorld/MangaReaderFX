@@ -111,14 +111,15 @@ public class OnlineMangaDetailController extends BaseController implements Initi
             button.setPrefWidth(90);
             ChapterBean item = currentManga.getChapters().get(i);
             button.setText("第" + item.getChapterPosition() + "话");
+            final int pos=i;
             button.setOnAction(event -> {
-                openReadManga(item.getChapterUrl());
+                openReadManga(pos);
             });
             chapterGp.add(button, (i % column), (int) (i / column));
         }
     }
 
-    private void openReadManga(String url) {
+    private void openReadManga(int position) {
         try {
             Stage window = new Stage();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/read.fxml"));
@@ -133,7 +134,7 @@ public class OnlineMangaDetailController extends BaseController implements Initi
             window.show();
             controller.setStage(window);
             controller.setScene(scene);
-            controller.setOnlinePath(url,currentManga.getName(),spider);
+            controller.setOnlinePath(currentManga.getChapters().get(position).getChapterUrl(),currentManga.getName(),position,spider);
         } catch (Exception e) {
             e.printStackTrace();
         }
