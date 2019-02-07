@@ -20,6 +20,8 @@ public class Configure {
     final public static String WRONG_WEBSITE_EXCEPTION = "wrong_website_exception";
     final public static String YOUDAO = "http://fanyi.youdao.com/openapi.do?keyfrom=mangaeasywa" +
             "tch&key=986400551&type=data&doctype=json&version=1.1&q=";
+    final public static String NAME="英文漫画阅读器";
+    final public static String LOADING="(加载中...)";
     // 3DES加密key
     final public static String key = "iq2szojof6x1ckgejwe52urw";
     //收藏类型

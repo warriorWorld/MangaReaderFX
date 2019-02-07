@@ -8,6 +8,7 @@ import java.util.ResourceBundle;
 import base.BaseController;
 import bean.ChapterBean;
 import bean.MangaBean;
+import configure.Configure;
 import dialog.AlertDialog;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -42,6 +43,7 @@ public class OnlineMangaDetailController extends BaseController implements Initi
     }
 
     public void setUrl(String url, SpiderBase spider) {
+        stage.setTitle(Configure.NAME+Configure.LOADING);
         this.spider=spider;
         spider.getMangaDetail(url, new JsoupCallBack<MangaBean>() {
             @Override
@@ -87,6 +89,7 @@ public class OnlineMangaDetailController extends BaseController implements Initi
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                stage.setTitle(Configure.NAME);
                 nameLb.setText("漫画名称:" + currentManga.getName());
                 authorLb.setText("作者:" + currentManga.getAuthor());
 
@@ -128,7 +131,7 @@ public class OnlineMangaDetailController extends BaseController implements Initi
             ReadController controller = fxmlLoader.getController(); //获取Controller的实例对象
             Scene scene = new Scene(root, 800, 500);
 
-            window.setTitle("英文漫画阅读器");
+            window.setTitle(Configure.NAME);
             window.setMaximized(true);
             window.setScene(scene);
             window.show();

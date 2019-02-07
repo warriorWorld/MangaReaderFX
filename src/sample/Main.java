@@ -3,6 +3,7 @@ package sample;
 import java.io.IOException;
 
 import base.BaseController;
+import configure.Configure;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,7 +22,7 @@ public class Main extends Application {
         BaseController controller = fxmlLoader.getController(); //获取Controller的实例对象
         Scene scene=new Scene(root, 800, 500);
 
-        primaryStage.setTitle("英文漫画阅读器");
+        primaryStage.setTitle(Configure.NAME);
         primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.show();

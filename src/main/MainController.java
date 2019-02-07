@@ -8,6 +8,7 @@ import java.util.ResourceBundle;
 import base.BaseController;
 import bean.MangaBean;
 import bean.MangaListBean;
+import configure.Configure;
 import configure.ShareKeys;
 import dialog.AlertDialog;
 import javafx.application.Platform;
@@ -69,14 +70,19 @@ public class MainController extends BaseController implements Initializable {
              mangaDetailRoot = fxmlLoader1.load();
             //如果使用 Parent root = FXMLLoader.load(...) 静态读取方法，无法获取到Controller的实例对象
             onlineMangaDetailcontroller = fxmlLoader1.getController(); //获取Controller的实例对象
-            onlineMangaDetailcontroller.setStage(stage);
-            onlineMangaDetailcontroller.setScene(scene);
         } catch (IOException e) {
             e.printStackTrace();
         }
         initUI();
         initSpider("KaKaLot");
     }
+
+    @Override
+    public void setStage(Stage stage) {
+        super.setStage(stage);
+        onlineMangaDetailcontroller.setStage(stage);
+    }
+
 
     private void initSpider(String spiderName) {
         try {
@@ -213,6 +219,7 @@ public class MainController extends BaseController implements Initializable {
     @Override
     public void setScene(Scene scene) {
         super.setScene(scene);
+        onlineMangaDetailcontroller.setScene(scene);
         if (null != ShareObjUtil.getObject(ShareKeys.MAIN_PAGE_CHCHE)) {
             try {
                 currentMangaList = (ArrayList<MangaBean>) ShareObjUtil.getObject(ShareKeys.MAIN_PAGE_CHCHE);
@@ -226,6 +233,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     private void doGetData(int page) {
+        stage.setTitle(Configure.NAME+Configure.LOADING);
         spider.getMangaList("all",
                 page + "", new JsoupCallBack<MangaListBean>() {
                     @Override
@@ -233,6 +241,7 @@ public class MainController extends BaseController implements Initializable {
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
+                                stage.setTitle(Configure.NAME);
                                 currentMangaList = result.getMangaList();
                                 ShareObjUtil.saveObject(currentMangaList, ShareKeys.MAIN_PAGE_CHCHE);
                                 initOnlineList();

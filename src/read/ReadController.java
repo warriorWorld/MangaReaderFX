@@ -72,7 +72,6 @@ public class ReadController extends BaseController implements Initializable {
     @Override
     public void setStage(Stage stage) {
         super.setStage(stage);
-        stage.setTitle("具体漫画名称");
     }
 
     @Override
@@ -178,7 +177,7 @@ public class ReadController extends BaseController implements Initializable {
     }
 
     private void toPage(final int page) {
-        stage.setTitle(title+"(加载中...)");
+        stage.setTitle(title+Configure.LOADING);
         mScrollPane.setVvalue(0);
         currentPosition = page;
         currentPageLb.setText((page + 1) + "/" + paths.size());
@@ -283,11 +282,12 @@ public class ReadController extends BaseController implements Initializable {
     }
 
     public void setOnlinePath(String url, String mangaName, int chapterPosition, SpiderBase spider) {
+
         mSourceType = SourceType.ONLINE;
         path = url;
         title = mangaName;
         chapterPos = chapterPosition;
-        stage.setTitle(title);
+        stage.setTitle(title+Configure.LOADING);
 
         receiveProgress();
         spider.getMangaChapterPics(url, new JsoupCallBack<ArrayList<String>>() {
