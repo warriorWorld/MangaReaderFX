@@ -9,6 +9,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -17,6 +18,8 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import read.ReadController;
 
 public class MainController extends BaseController implements Initializable {
     public ListView menuLv;
@@ -102,9 +105,11 @@ public class MainController extends BaseController implements Initializable {
             menuLv.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
-
                     if (event.getButton().toString().equals("PRIMARY")) {
                         switch (menuLv.getSelectionModel().getSelectedIndex()) {
+                            case 6:
+                                openReadManga();
+                                break;
                             case 8:
                                 if (!mStackPane.getChildren().equals(optionsRoot)) {
                                     mStackPane.getChildren().clear();
@@ -113,9 +118,29 @@ public class MainController extends BaseController implements Initializable {
                                 break;
                         }
                     }
-
                 }
             });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void openReadManga() {
+        try {
+            Stage window = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/read.fxml"));
+            Parent root = fxmlLoader.load();
+            //如果使用 Parent root = FXMLLoader.load(...) 静态读取方法，无法获取到Controller的实例对象
+            ReadController controller = fxmlLoader.getController(); //获取Controller的实例对象
+            Scene scene = new Scene(root, 800, 500);
+
+            window.setTitle("英文漫画阅读器");
+            window.setMaximized(true);
+            window.setScene(scene);
+            window.show();
+            controller.setStage(window);
+            controller.setScene(scene);
+            controller.setPath("E:\\Manga\\testmanga");
         } catch (Exception e) {
             e.printStackTrace();
         }
