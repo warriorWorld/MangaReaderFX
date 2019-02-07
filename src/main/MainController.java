@@ -159,7 +159,7 @@ public class MainController extends BaseController implements Initializable {
                 FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("/fxml/item_manga_list.fxml"));
                 Parent item = fxmlLoader1.load();
                 ItemMangaController itemController = fxmlLoader1.getController();
-                itemController.setMangaThumbil("/drawable/online_icon.png");
+                itemController.setMangaThumbil("https://s3.mangareader.net/cover/naruto/naruto-l0.jpg");
                 itemController.setMangaName("在线漫画");
                 onlineGrid.add(item, (i % column), (int) (i / column));
             }
