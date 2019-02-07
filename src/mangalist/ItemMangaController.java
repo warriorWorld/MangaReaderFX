@@ -16,7 +16,7 @@ public class ItemMangaController extends BaseController implements Initializable
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        mangaIv.setPreserveRatio(true);
+//        mangaIv.setPreserveRatio(true);
     }
 
     public void setMangaThumbil(String img) {

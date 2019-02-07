@@ -42,6 +42,9 @@
                <children>
                   <Button fx:id="backBtn" mnemonicParsing="false" text="后退" />
                   <Region />
+                  <Button fx:id="previousBtn" mnemonicParsing="false" text="上一页" />
+                  <TextField fx:id="pageTf" prefHeight="23.0" prefWidth="32.0" text="1" />
+                  <Button fx:id="nextBtn" mnemonicParsing="false" text="下一页" />
                   <Region HBox.hgrow="ALWAYS" />
                   <TextField fx:id="userNameTf" promptText="账号" />
                   <PasswordField fx:id="mPasswordField" promptText="密码" />
@@ -61,9 +64,6 @@
       <ListView fx:id="menuLv" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </left>
    <center>
-      <StackPane fx:id="mStackPane" BorderPane.alignment="CENTER">
-         <children>
-            <Region fx:id="mRegion" prefHeight="200.0" prefWidth="200.0" />
-         </children></StackPane>
+      <StackPane fx:id="mStackPane" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

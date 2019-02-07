@@ -40,6 +40,9 @@ public class MainController extends BaseController implements Initializable {
     private Parent optionsRoot;
     private ScrollPane onlineScrollPane;
     private GridPane onlineGrid;
+    public Button previousBtn;
+    public Button nextBtn;
+    public TextField pageTf;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -115,24 +118,36 @@ public class MainController extends BaseController implements Initializable {
                 @Override
                 public void handle(MouseEvent event) {
                     if (event.getButton().toString().equals("PRIMARY")) {
-                        switch (menuLv.getSelectionModel().getSelectedIndex()) {
-                            case 0:
-                                mStackPane.getChildren().clear();
-                                mStackPane.getChildren().add(onlineScrollPane);
-                                break;
-                            case 6:
-                                openReadManga();
-                                break;
-                            case 8:
-                                mStackPane.getChildren().clear();
-                                mStackPane.getChildren().add(optionsRoot);
-                                break;
-                        }
+                        toggleContent(menuLv.getSelectionModel().getSelectedIndex());
                     }
                 }
             });
+
+            toggleContent(0);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void toggleContent(int position) {
+        previousBtn.setVisible(false);
+        pageTf.setVisible(false);
+        nextBtn.setVisible(false);
+        switch (position) {
+            case 0:
+                previousBtn.setVisible(true);
+                pageTf.setVisible(true);
+                nextBtn.setVisible(true);
+                mStackPane.getChildren().clear();
+                mStackPane.getChildren().add(onlineScrollPane);
+                break;
+            case 6:
+                openReadManga();
+                break;
+            case 8:
+                mStackPane.getChildren().clear();
+                mStackPane.getChildren().add(optionsRoot);
+                break;
         }
     }
 
@@ -159,7 +174,7 @@ public class MainController extends BaseController implements Initializable {
                 FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("/fxml/item_manga_list.fxml"));
                 Parent item = fxmlLoader1.load();
                 ItemMangaController itemController = fxmlLoader1.getController();
-                itemController.setMangaThumbil("https://s3.mangareader.net/cover/naruto/naruto-l0.jpg");
+                itemController.setMangaThumbil("http://ws3.sinaimg.cn/mw600/007Bhwjoly1fzxn5zfgoij30y019c1kx.jpg");
                 itemController.setMangaName("在线漫画");
                 onlineGrid.add(item, (i % column), (int) (i / column));
             }
