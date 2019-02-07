@@ -19,9 +19,9 @@ public class MainItemController extends BaseController implements Initializable 
 
     }
 
-    public void setIconIv() {
+    public void setIconIv(String img) {
         iconIv.setPreserveRatio(true);
-        iconIv.setImage(new Image("/drawable/local_icon.png"));
+        iconIv.setImage(new Image(img));
     }
 
     public void setOptionText(String text) {
