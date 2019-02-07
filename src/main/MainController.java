@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import base.BaseController;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -15,12 +16,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import mangalist.ItemMangaController;
 import read.ReadController;
 
 public class MainController extends BaseController implements Initializable {
@@ -32,32 +36,21 @@ public class MainController extends BaseController implements Initializable {
     public TextField userNameTf;
     public PasswordField mPasswordField;
     public StackPane mStackPane;
+    public Region mRegion;
     public Label userNameLb;
     private Parent optionsRoot;
-    private GridPane onlineGrid;
+    private ScrollPane onlineScrollPane;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/options.fxml"));
             optionsRoot = fxmlLoader.load();
-
-            onlineGrid = new GridPane();
-            onlineGrid.setPadding(new Insets(10, 10, 10, 10));
-            onlineGrid.setVgap(8);
-            onlineGrid.setHgap(10);
-            for(int i=0;i<20;i++){
-                FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("/fxml/item_main_options.fxml"));
-                Parent item = fxmlLoader1.load();
-                MainItemController itemController = fxmlLoader1.getController();
-                itemController.setIconIv("/drawable/online_icon.png");
-                itemController.setOptionText("在线漫画");
-                onlineGrid.add(item,(i%3),(int)(i/3));
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
         initUI();
+        initOnlinePaneUI();
     }
 
     private void initUI() {
@@ -124,25 +117,43 @@ public class MainController extends BaseController implements Initializable {
                     if (event.getButton().toString().equals("PRIMARY")) {
                         switch (menuLv.getSelectionModel().getSelectedIndex()) {
                             case 0:
-                                if (!mStackPane.getChildren().equals(onlineGrid)) {
-                                    mStackPane.getChildren().clear();
-                                    mStackPane.getChildren().add(onlineGrid);
-                                }
+                                mStackPane.getChildren().clear();
+                                mStackPane.getChildren().add(onlineScrollPane);
                                 break;
                             case 6:
                                 openReadManga();
                                 break;
                             case 8:
-                                if (!mStackPane.getChildren().equals(optionsRoot)) {
-                                    mStackPane.getChildren().clear();
-                                    mStackPane.getChildren().add(optionsRoot);
-                                }
+                                mStackPane.getChildren().clear();
+                                mStackPane.getChildren().add(optionsRoot);
                                 break;
                         }
                     }
                 }
             });
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initOnlinePaneUI() {
+        try {
+            onlineScrollPane = new ScrollPane();
+            GridPane onlineGrid = new GridPane();
+            onlineGrid.setPadding(new Insets(10, 10, 10, 10));
+            onlineGrid.setVgap(8);
+            onlineGrid.setHgap(10);
+            int column = (int) (2000 / 200);
+            for (int i = 0; i < 20; i++) {
+                FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("/fxml/item_manga_list.fxml"));
+                Parent item = fxmlLoader1.load();
+                ItemMangaController itemController = fxmlLoader1.getController();
+                itemController.setMangaThumbil("/drawable/online_icon.png");
+                itemController.setMangaName("在线漫画");
+                onlineGrid.add(item, (i % column), (int) (i / column));
+            }
+            onlineScrollPane.setContent(onlineGrid);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
