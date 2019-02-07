@@ -36,21 +36,21 @@ public class MainController extends BaseController implements Initializable {
     public TextField userNameTf;
     public PasswordField mPasswordField;
     public StackPane mStackPane;
-    public Region mRegion;
     public Label userNameLb;
     private Parent optionsRoot;
     private ScrollPane onlineScrollPane;
+    private GridPane onlineGrid;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/options.fxml"));
             optionsRoot = fxmlLoader.load();
+            initOnlinePaneUI();
         } catch (IOException e) {
             e.printStackTrace();
         }
         initUI();
-        initOnlinePaneUI();
     }
 
     private void initUI() {
@@ -136,14 +136,25 @@ public class MainController extends BaseController implements Initializable {
         }
     }
 
+    @Override
+    public void setScene(Scene scene) {
+        super.setScene(scene);
+        initOnlineList();
+    }
+
     private void initOnlinePaneUI() {
+        onlineScrollPane = new ScrollPane();
+        onlineGrid = new GridPane();
+        onlineGrid.setPadding(new Insets(10, 10, 10, 10));
+        onlineGrid.setVgap(8);
+        onlineGrid.setHgap(10);
+        onlineScrollPane.setContent(onlineGrid);
+    }
+
+    private void initOnlineList() {
         try {
-            onlineScrollPane = new ScrollPane();
-            GridPane onlineGrid = new GridPane();
-            onlineGrid.setPadding(new Insets(10, 10, 10, 10));
-            onlineGrid.setVgap(8);
-            onlineGrid.setHgap(10);
-            int column = (int) (2000 / 200);
+            int width = (int) (scene.getWidth() - menuLv.getWidth());
+            int column = (int) (width / 200) - 1;
             for (int i = 0; i < 20; i++) {
                 FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("/fxml/item_manga_list.fxml"));
                 Parent item = fxmlLoader1.load();
@@ -152,7 +163,6 @@ public class MainController extends BaseController implements Initializable {
                 itemController.setMangaName("在线漫画");
                 onlineGrid.add(item, (i % column), (int) (i / column));
             }
-            onlineScrollPane.setContent(onlineGrid);
         } catch (IOException e) {
             e.printStackTrace();
         }

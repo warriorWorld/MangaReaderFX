@@ -22,7 +22,7 @@ public class Main extends Application {
         Scene scene=new Scene(root, 800, 500);
 
         primaryStage.setTitle("英文漫画阅读器");
-//        primaryStage.setMaximized(true);
+        primaryStage.setMaximized(true);
         primaryStage.setScene(scene);
         primaryStage.show();
         controller.setStage(primaryStage);
