@@ -8,6 +8,7 @@ import java.util.ResourceBundle;
 import base.BaseController;
 import bean.MangaBean;
 import bean.MangaListBean;
+import configure.ShareKeys;
 import dialog.AlertDialog;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -23,6 +24,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
@@ -33,6 +35,7 @@ import listener.OnItemClickListener;
 import mangalist.ItemMangaController;
 import read.ReadController;
 import spider.SpiderBase;
+import utils.ShareObjUtil;
 
 public class MainController extends BaseController implements Initializable {
     public ListView menuLv;
@@ -151,10 +154,22 @@ public class MainController extends BaseController implements Initializable {
                 doGetData(currentPage);
             });
             previousBtn.setOnAction(event -> {
-                if (currentPage>1) {
+                if (currentPage > 1) {
                     currentPage--;
                     pageTf.setText(currentPage + "");
                     doGetData(currentPage);
+                }
+            });
+            pageTf.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent event) {
+                    if (event.getCode().toString().equals("ENTER")) {
+                        int page = Integer.valueOf(pageTf.getText());
+                        if (page > 0) {
+                            currentPage = page;
+                            doGetData(currentPage);
+                        }
+                    }
                 }
             });
 
@@ -189,7 +204,16 @@ public class MainController extends BaseController implements Initializable {
     @Override
     public void setScene(Scene scene) {
         super.setScene(scene);
-        doGetData(1);
+        if (null != ShareObjUtil.getObject(ShareKeys.MAIN_PAGE_CHCHE)) {
+            try {
+                currentMangaList = (ArrayList<MangaBean>) ShareObjUtil.getObject( ShareKeys.MAIN_PAGE_CHCHE);
+                initOnlineList();
+            }catch (Exception e){
+                doGetData(1);
+            }
+        } else {
+            doGetData(1);
+        }
     }
 
     private void doGetData(int page) {
@@ -201,7 +225,7 @@ public class MainController extends BaseController implements Initializable {
                             @Override
                             public void run() {
                                 currentMangaList = result.getMangaList();
-//                                ShareObjUtil.saveObject(getActivity(), currentMangaList, ShareKeys.MAIN_PAGE_CHCHE);
+                                ShareObjUtil.saveObject(currentMangaList, ShareKeys.MAIN_PAGE_CHCHE);
                                 initOnlineList();
                             }
                         });
