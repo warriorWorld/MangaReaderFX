@@ -11,19 +11,21 @@ import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
 import base.BaseController;
 import bean.YoudaoResponse;
 import configure.Configure;
+import configure.ShareKeys;
 import dialog.AlertDialog;
 import dialog.EditDialog;
 import enums.SourceType;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
@@ -47,6 +49,7 @@ public class ReadController extends BaseController implements Initializable {
     public ScrollPane mScrollPane;
     public Label currentInputLb, currentPageLb;
     public MenuItem jumpMi;
+    public CheckMenuItem closeTranslateCm;
     private String currentInput = "";
     private Clipboard mClipboard;
     private ArrayList<String> paths = new ArrayList<>();
@@ -125,9 +128,19 @@ public class ReadController extends BaseController implements Initializable {
                 }
             }
         });
+        closeTranslateCm.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                mPreferences.putBoolean(ShareKeys.CLOSE_TRANSLATE, closeTranslateCm.isSelected());
+            }
+        });
+        closeTranslateCm.setSelected(mPreferences.getBoolean(ShareKeys.CLOSE_TRANSLATE,false));
     }
 
     private void translateWord(final String word) {
+        if (mPreferences.getBoolean(ShareKeys.CLOSE_TRANSLATE,false)){
+            return;
+        }
         String url = Configure.YOUDAO + word;
         HttpService.getInstance().requestGetData(url, YoudaoResponse.class, new HttpBack<YoudaoResponse>() {
             @Override

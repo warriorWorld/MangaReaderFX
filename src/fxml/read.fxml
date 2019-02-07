@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -48,6 +49,11 @@
                   <MenuItem mnemonicParsing="false" text="删除图片" />
             </items>
           </Menu>
+            <Menu mnemonicParsing="false" text="设置">
+               <items>
+                  <CheckMenuItem fx:id="closeTranslateCm" mnemonicParsing="false" text="关闭本地翻译弹窗" />
+               </items>
+            </Menu>
           <Menu mnemonicParsing="false" text="关于">
             <items>
               <MenuItem mnemonicParsing="false" text="作者" />
