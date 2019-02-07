@@ -42,24 +42,34 @@ public class MainController extends BaseController implements Initializable {
     }
 
     private void initUI() {
-        menuLv.getItems().addAll("在线漫画", "本地漫画", "我的收藏", "正在追更", "我已看完", "数据统计", "生词本", "正在下载", "设置");
-        menuLv.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        menuLv.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/item_main_options.fxml"));
+            Parent item = fxmlLoader.load();
+            MainItemController itemController=fxmlLoader.getController();
+            itemController.setIconIv();
+            itemController.setOptionText("测试测试");
 
-                if (event.getButton().toString().equals("PRIMARY")) {
-                    switch (menuLv.getSelectionModel().getSelectedIndex()) {
-                        case 8:
-                            if (!mStackPane.getChildren().equals(optionsRoot)) {
-                                mStackPane.getChildren().clear();
-                                mStackPane.getChildren().add(optionsRoot);
-                            }
-                            break;
+            menuLv.getItems().addAll("在线漫画", "本地漫画", "我的收藏", "正在追更", "我已看完", "数据统计", "生词本", "正在下载", "设置",item);
+            menuLv.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+            menuLv.setOnMouseClicked(new EventHandler<MouseEvent>() {
+                @Override
+                public void handle(MouseEvent event) {
+
+                    if (event.getButton().toString().equals("PRIMARY")) {
+                        switch (menuLv.getSelectionModel().getSelectedIndex()) {
+                            case 8:
+                                if (!mStackPane.getChildren().equals(optionsRoot)) {
+                                    mStackPane.getChildren().clear();
+                                    mStackPane.getChildren().add(optionsRoot);
+                                }
+                                break;
+                        }
                     }
-                }
 
-            }
-        });
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
