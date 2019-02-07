@@ -71,7 +71,6 @@ public class MainController extends BaseController implements Initializable {
             onlineMangaDetailcontroller = fxmlLoader1.getController(); //获取Controller的实例对象
             onlineMangaDetailcontroller.setStage(stage);
             onlineMangaDetailcontroller.setScene(scene);
-            onlineMangaDetailcontroller.setStackPaneWidth(stackPaneWidth);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -275,6 +274,7 @@ public class MainController extends BaseController implements Initializable {
                     public void onClick(int position) {
                         mStackPane.getChildren().clear();
                         mStackPane.getChildren().add(mangaDetailRoot);
+                        onlineMangaDetailcontroller.setStackPaneWidth(stackPaneWidth);
                         onlineMangaDetailcontroller.setUrl(currentMangaList.get(position).getUrl(),spider);
                     }
                 });

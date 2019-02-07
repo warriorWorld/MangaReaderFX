@@ -31,7 +31,6 @@ public class OnlineMangaDetailController extends BaseController implements Initi
     public GridPane chapterGp;
     private MangaBean currentManga;
     private int stackPaneWidth = 0;
-    private ArrayList<ChapterBean> chapterList = new ArrayList<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -42,10 +41,8 @@ public class OnlineMangaDetailController extends BaseController implements Initi
         spider.getMangaDetail(url, new JsoupCallBack<MangaBean>() {
             @Override
             public void loadSucceed(final MangaBean result) {
-
                 currentManga = result;
                 refreshUI();
-
             }
 
             @Override
@@ -98,10 +95,11 @@ public class OnlineMangaDetailController extends BaseController implements Initi
 
     private void initGridView() {
         chapterGp.getChildren().clear();
-        int column = (int) (stackPaneWidth / 100) - 1;
-        for (int i = 0; i < chapterList.size(); i++) {
+        int column = (int) (stackPaneWidth/ 90);
+        for (int i = 0; i < currentManga.getChapters().size(); i++) {
             Button button = new Button();
-            ChapterBean item = chapterList.get(i);
+            button.setPrefWidth(90);
+            ChapterBean item = currentManga.getChapters().get(i);
             button.setText("第" + item.getChapterPosition() + "话");
             button.setOnAction(event -> {
                 AlertDialog.display("tit", item.getChapterUrl(), "ddd");
