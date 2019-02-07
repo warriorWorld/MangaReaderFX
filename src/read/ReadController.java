@@ -11,6 +11,7 @@ import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
@@ -56,6 +57,7 @@ public class ReadController extends BaseController implements Initializable {
     private int currentPosition = 0;
     private Preferences mPreferences;
     private SourceType mSourceType;
+    private HashMap<Integer, Image> cacheList = new HashMap<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -134,11 +136,11 @@ public class ReadController extends BaseController implements Initializable {
                 mPreferences.putBoolean(ShareKeys.CLOSE_TRANSLATE, closeTranslateCm.isSelected());
             }
         });
-        closeTranslateCm.setSelected(mPreferences.getBoolean(ShareKeys.CLOSE_TRANSLATE,false));
+        closeTranslateCm.setSelected(mPreferences.getBoolean(ShareKeys.CLOSE_TRANSLATE, false));
     }
 
     private void translateWord(final String word) {
-        if (mPreferences.getBoolean(ShareKeys.CLOSE_TRANSLATE,false)){
+        if (mPreferences.getBoolean(ShareKeys.CLOSE_TRANSLATE, false)) {
             return;
         }
         String url = Configure.YOUDAO + word;
@@ -181,13 +183,34 @@ public class ReadController extends BaseController implements Initializable {
                 mIv.setImage(new Image(paths.get(currentPosition)));
                 break;
             case ONLINE:
+                if (page < paths.size() - 2) {
+                    //预加载下一页
+                    if (null == cacheList.get(currentPosition + 1)) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    final Image image;
+                                    image = ImgUtil.createImage(paths.get(currentPosition + 1));
+                                    cacheList.put(currentPosition + 1, image);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+                    }
+                }
+                if (null != cacheList.get(page)) {
+                    mIv.setImage(cacheList.get(page));
+                    return;
+                }
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
                             final Image image;
                             image = ImgUtil.createImage(paths.get(currentPosition));
-
+                            cacheList.put(currentPosition, image);
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
@@ -262,7 +285,12 @@ public class ReadController extends BaseController implements Initializable {
 
             @Override
             public void loadFailed(String error) {
-                AlertDialog.display("错误", error, "确定");
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertDialog.display("错误", error, "确定");
+                    }
+                });
             }
         });
     }

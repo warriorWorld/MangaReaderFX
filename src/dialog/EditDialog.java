@@ -35,6 +35,6 @@ public class EditDialog {
 
         Scene scene = new Scene(vBox);
         window.setScene(scene);
-        window.showAndWait();
+        window.show();
     }
 }

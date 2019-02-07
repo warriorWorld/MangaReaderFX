@@ -52,7 +52,12 @@ public class OnlineMangaDetailController extends BaseController implements Initi
 
             @Override
             public void loadFailed(String error) {
-                AlertDialog.display("错误", error, "确定");
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        AlertDialog.display("错误", error, "确定");
+                    }
+                });
             }
         });
     }
