@@ -30,8 +30,12 @@ public class ImgUtil {
         }
     }
 
-    public static void saveToFile(Image image,String path) {
+    public static void saveToFile(Image image, String path) {
         File outputFile = new File(path);
+        if (!outputFile.exists()) {
+            // 如果不存在 就创建
+            outputFile.mkdirs();
+        }
         BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
         try {
             ImageIO.write(bImage, "png", outputFile);

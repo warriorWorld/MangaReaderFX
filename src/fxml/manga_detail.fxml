@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
@@ -16,7 +17,13 @@
       <VBox prefHeight="200.0" prefWidth="100.0" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
             <ImageView fx:id="mangaIv" fitHeight="400.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true" />
-            <Button fx:id="collectBtn" mnemonicParsing="false" text="收藏" />
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="13.0">
+               <children>
+                  <Button fx:id="collectBtn" mnemonicParsing="false" text="收藏" />
+                  <Button fx:id="downloadAllBtn" mnemonicParsing="false" text="下载全部" />
+                  <Button fx:id="downloadBtn" mnemonicParsing="false" text="选择章节下载" />
+               </children>
+            </HBox>
             <Label fx:id="nameLb" text="名称" />
             <Label fx:id="authorLb" text="作者" />
             <Label fx:id="typeLb" text="类型" />

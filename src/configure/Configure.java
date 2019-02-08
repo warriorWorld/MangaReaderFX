@@ -15,8 +15,7 @@ public class Configure {
     public final static String[] masterWebsList = {"MangaReader", "NManga", "KaKaLot", "LManga"};
     public final static String[] VPN_MUST_LIST = {"NOTHING"};
     public final static String DST_FOLDER_NAME = "Manga";
-    final public static String STORAGEPATH = "E:\\" + DST_FOLDER_NAME;
-    final public static String DOWNLOAD_PATH = "E:\\manga\\download";
+    final public static String DOWNLOAD_PATH =  "E:/" + DST_FOLDER_NAME;;
     final public static String WRONG_WEBSITE_EXCEPTION = "wrong_website_exception";
     final public static String YOUDAO = "http://fanyi.youdao.com/openapi.do?keyfrom=mangaeasywa" +
             "tch&key=986400551&type=data&doctype=json&version=1.1&q=";

@@ -7,9 +7,11 @@ import java.util.ResourceBundle;
 
 import base.BaseController;
 import bean.ChapterBean;
+import bean.DownloadBean;
 import bean.MangaBean;
 import configure.Configure;
 import dialog.AlertDialog;
+import dialog.EditDialog;
 import download.DownloadMangaManager;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -22,6 +24,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import listener.EditResultListener;
 import listener.JsoupCallBack;
 import listener.OnItemClickListener;
 import mangalist.ItemMangaController;
@@ -31,7 +34,7 @@ import utils.ImgUtil;
 
 public class OnlineMangaDetailController extends BaseController implements Initializable {
     public Label nameLb, authorLb, typeLb, lastUpdateLb;
-    public Button collectBtn;
+    public Button collectBtn, downloadAllBtn, downloadBtn;
     public ImageView mangaIv;
     public GridPane chapterGp;
     private MangaBean currentManga;
@@ -45,7 +48,24 @@ public class OnlineMangaDetailController extends BaseController implements Initi
 
     private void initUI() {
         collectBtn.setOnAction(event -> {
-            DownloadMangaManager.getInstance().download1Img("http://ww3.sinaimg.cn/mw600/0073ob6Pgy1fzyxg5dy1gj30gr0p9wol.jpg");
+            DownloadMangaManager.getInstance().download1Img("http://ww3.sinaimg.cn/mw600/0073ob6Pgy1fzyxg5dy1gj30gr0p9wol.jpg", "/test/test.png");
+        });
+        downloadAllBtn.setOnAction(event -> {
+            downloadAll();
+        });
+        downloadBtn.setOnAction(event -> {
+            EditDialog.display("选择下载", "请输入要下载的章节,用-分隔.如:12-158", "确定", new EditResultListener() {
+                @Override
+                public void onResult(String result) {
+                    try {
+                        String[] res = result.split("\\-");
+                        doDownload(Integer.valueOf(res[0])-1, Integer.valueOf(res[1])-1);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        AlertDialog.display("请按格式输入");
+                    }
+                }
+            });
         });
     }
 
@@ -148,6 +168,26 @@ public class OnlineMangaDetailController extends BaseController implements Initi
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void downloadAll() {
+        doDownload(0, currentManga.getChapters().size() - 1);
+    }
+
+    private void doDownload(int start, int end) {
+        DownloadMangaManager.getInstance().reset();
+        MangaBean temp = currentManga;
+        ArrayList<ChapterBean> chapters = new ArrayList<>();
+        for (int i = start; i <= end; i++) {
+            ChapterBean item = new ChapterBean();
+            item = currentManga.getChapters().get(i);
+            chapters.add(item);
+        }
+        temp.setChapters(chapters);
+        DownloadBean.getInstance().setMangaBean(temp);
+        DownloadBean.getInstance().initDownloadChapters();
+        DownloadBean.getInstance().setWebSite("KaKaLot");
+        DownloadMangaManager.getInstance().doDownload();
     }
 
     public void setStackPaneWidth(int stackPaneWidth) {

@@ -19,7 +19,8 @@ public class EditDialog {
         window.setTitle(title);
         window.setMinWidth(300);
         TextField inputField=new TextField();
-        inputField.setPromptText(message);
+        Label messageLb = new Label(message);
+//        inputField.setPromptText(message);
         Button closeBtn = new Button(okText);
         closeBtn.setOnAction(event -> {
             if (null!=listener){
@@ -29,7 +30,7 @@ public class EditDialog {
         });
 
         VBox vBox = new VBox(20);
-        vBox.getChildren().addAll(inputField, closeBtn);
+        vBox.getChildren().addAll(messageLb,inputField, closeBtn);
         vBox.setAlignment(Pos.CENTER);
         vBox.setPadding(new Insets(20,20,20,20));
 
