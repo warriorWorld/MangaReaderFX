@@ -74,6 +74,7 @@ public class MainController extends BaseController implements Initializable {
     private OnlineMangaDetailController onlineMangaDetailcontroller;
     private ArrayList<String> pathList;//本地图片地址
     private int currentScenePos = 0;
+    private ArrayList<String> histroyPath = new ArrayList<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -219,8 +220,12 @@ public class MainController extends BaseController implements Initializable {
             });
             backBtn.setOnAction(event -> {
                 toggleContent(currentScenePos);
-                if (currentScenePos == 1) {
-                    doGetLocalManga(Configure.getMangaDirectory());
+                switch (currentScenePos) {
+                    case 0:
+                        break;
+                    case 1:
+                        localMangaGoBack();
+                        break;
                 }
             });
             refreshBtn.setOnAction(event -> {
@@ -236,6 +241,15 @@ public class MainController extends BaseController implements Initializable {
             toggleContent(0);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void localMangaGoBack() {
+        if (histroyPath.size() > 1) {
+            histroyPath.remove(histroyPath.size() - 1);
+            doGetLocalManga(histroyPath.get(histroyPath.size() - 1));
+        } else {
+            doGetLocalManga(Configure.getMangaDirectory());
         }
     }
 
@@ -356,6 +370,12 @@ public class MainController extends BaseController implements Initializable {
     }
 
     private void doGetLocalManga(String url) {
+        if (url.equals(Configure.getMangaDirectory())) {
+            histroyPath.clear();
+        }
+        if (!histroyPath.contains(url)) {
+            histroyPath.add(url);
+        }
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -364,7 +384,12 @@ public class MainController extends BaseController implements Initializable {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        initLocalList();
+                        if (isNextNextDirectory(url)) {
+                            initLocalList();
+                        } else {
+                            openReadManga();
+                            localMangaGoBack();
+                        }
                     }
                 });
             }
@@ -456,6 +481,12 @@ public class MainController extends BaseController implements Initializable {
         }
     }
 
+    private boolean isNextNextDirectory(String path) {
+        File f = new File(path);
+        File[] fs = f.listFiles();
+        return isNextDirectory(fs[0].getPath());
+    }
+
     private void initLocalList() {
         try {
             localGrid.getChildren().clear();
@@ -473,8 +504,6 @@ public class MainController extends BaseController implements Initializable {
                     public void onClick(int position) {
                         if (isNextDirectory(localMangaList.get(position).getUrl())) {
                             doGetLocalManga(localMangaList.get(position).getUrl());
-                        } else {
-                            openReadManga(position);
                         }
                     }
                 });
@@ -485,7 +514,7 @@ public class MainController extends BaseController implements Initializable {
         }
     }
 
-    private void openReadManga(int position) {
+    private void openReadManga() {
         try {
             Stage window = new Stage();
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/read.fxml"));
@@ -500,7 +529,7 @@ public class MainController extends BaseController implements Initializable {
             window.show();
             controller.setStage(window);
             controller.setScene(scene);
-            controller.setLocalPath(localMangaList.get(position).getUrl(), pathList);
+            controller.setLocalPath(localMangaList.get(0).getUrl(), pathList);
         } catch (Exception e) {
             e.printStackTrace();
         }
