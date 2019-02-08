@@ -5,6 +5,7 @@ package configure;
  */
 
 public class ShareKeys {
+    public static final String MANGA_DIRECTORY_KEY = "manga_directory_key";
     public static final String AUTO_TO_LAST_POSITION = "auto_to_last_position";
     public static final String ECONOMY_MODE = "economy_mode";
     public static final String CLOSE_TRANSLATE = "close_translate";

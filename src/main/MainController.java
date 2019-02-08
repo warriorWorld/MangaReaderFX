@@ -1,9 +1,11 @@
 package main;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 import base.BaseController;
 import bean.MangaBean;
@@ -21,6 +23,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
@@ -29,6 +32,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import listener.JsoupCallBack;
 import listener.OnItemClickListener;
@@ -48,7 +52,8 @@ public class MainController extends BaseController implements Initializable {
     public PasswordField mPasswordField;
     public StackPane mStackPane;
     public Label userNameLb;
-    private Parent optionsRoot,mangaDetailRoot;
+    public MenuItem directoryChooserMi;
+    private Parent optionsRoot, mangaDetailRoot;
     private ScrollPane onlineScrollPane;
     private GridPane onlineGrid;
     public Button previousBtn;
@@ -58,7 +63,7 @@ public class MainController extends BaseController implements Initializable {
     private SpiderBase spider;
     private int currentPage = 1;
     private int stackPaneWidth = 0;
-    private  OnlineMangaDetailController onlineMangaDetailcontroller;
+    private OnlineMangaDetailController onlineMangaDetailcontroller;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -67,7 +72,7 @@ public class MainController extends BaseController implements Initializable {
             optionsRoot = fxmlLoader.load();
             initOnlinePaneUI();
             FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("/fxml/manga_detail.fxml"));
-             mangaDetailRoot = fxmlLoader1.load();
+            mangaDetailRoot = fxmlLoader1.load();
             //如果使用 Parent root = FXMLLoader.load(...) 静态读取方法，无法获取到Controller的实例对象
             onlineMangaDetailcontroller = fxmlLoader1.getController(); //获取Controller的实例对象
         } catch (IOException e) {
@@ -162,6 +167,17 @@ public class MainController extends BaseController implements Initializable {
                     }
                 }
             });
+            directoryChooserMi.setOnAction(event -> {
+                DirectoryChooser chooser = new DirectoryChooser();
+                chooser.setInitialDirectory(new File("C:\\Users\\Administrator"));   //设置初始路径，默认为我的电脑
+                chooser.setTitle("选择漫画保存文件夹");                //设置窗口标题
+                try {
+                    Preferences mPreferences=Preferences.userRoot();
+                    mPreferences.put(ShareKeys.MANGA_DIRECTORY_KEY,chooser.showDialog(stage).toString().replaceAll("\\\\","/"));
+                } catch (NullPointerException ex) {
+                    ex.printStackTrace();
+                }
+            });
             nextBtn.setOnAction(event -> {
                 currentPage++;
                 pageTf.setText(currentPage + "");
@@ -233,7 +249,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     private void doGetData(int page) {
-        stage.setTitle(Configure.NAME+Configure.LOADING);
+        stage.setTitle(Configure.NAME + Configure.LOADING);
         spider.getMangaList("all",
                 page + "", new JsoupCallBack<MangaListBean>() {
                     @Override
@@ -283,7 +299,7 @@ public class MainController extends BaseController implements Initializable {
                         mStackPane.getChildren().clear();
                         mStackPane.getChildren().add(mangaDetailRoot);
                         onlineMangaDetailcontroller.setStackPaneWidth(stackPaneWidth);
-                        onlineMangaDetailcontroller.setUrl(currentMangaList.get(position).getUrl(),spider);
+                        onlineMangaDetailcontroller.setUrl(currentMangaList.get(position).getUrl(), spider);
                     }
                 });
                 onlineGrid.add(item, (i % column), (int) (i / column));

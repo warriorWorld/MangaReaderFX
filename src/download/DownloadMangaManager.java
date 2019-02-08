@@ -123,7 +123,7 @@ public class DownloadMangaManager {
                 try {
                     final Image image;
                     image = ImgUtil.createImage(imgUrl);
-                    ImgUtil.saveToFile(image, Configure.DOWNLOAD_PATH + "/"+fileName);
+                    ImgUtil.saveToFile(image, Configure.getMangaDirectory() + "/"+fileName);
                     refreshCurrentPagesInfo(imgUrl);
                     download1Img(currentChapter.getPages().get(0).getPage_url(), mangaName + "/" +
                             currentChapter.getChapter_child_folder_name() + "/" + currentChapter.getPages().get(0).getPage_file_name());

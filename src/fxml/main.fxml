@@ -21,9 +21,9 @@
          <children>
             <MenuBar>
               <menus>
-                <Menu mnemonicParsing="false" text="File">
+                <Menu mnemonicParsing="false" text="文件">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="Close" />
+                    <MenuItem fx:id="directoryChooserMi" mnemonicParsing="false" text="选择漫画保存地址" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Edit">
