@@ -8,7 +8,9 @@ import org.jsoup.select.Elements;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +45,7 @@ import okhttp.HttpService;
 import spider.FileSpider;
 import spider.SpiderBase;
 import utils.ImgUtil;
+import utils.ReplaceUtil;
 import utils.TextUtils;
 
 public class ReadController extends BaseController implements Initializable {
@@ -177,14 +180,18 @@ public class ReadController extends BaseController implements Initializable {
     }
 
     private void toPage(final int page) {
-        stage.setTitle(title+Configure.LOADING);
+        stage.setTitle(title + Configure.LOADING);
         mScrollPane.setVvalue(0);
         currentPosition = page;
         currentPageLb.setText((page + 1) + "/" + paths.size());
         saveProgress();
         switch (mSourceType) {
             case LOCAL:
-                mIv.setImage(new Image(paths.get(page)));
+                try {
+                    mIv.setImage(new Image(new File(paths.get(page)).toURI().toURL().toString()));
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
                 stage.setTitle(title);
                 break;
             case ONLINE:
@@ -220,7 +227,7 @@ public class ReadController extends BaseController implements Initializable {
                             Platform.runLater(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if (page==currentPosition) {
+                                    if (page == currentPosition) {
                                         mIv.setImage(image);
                                         stage.setTitle(title);
                                     }
@@ -270,14 +277,20 @@ public class ReadController extends BaseController implements Initializable {
         currentPosition = mPreferences.getInt(title + chapterPos + "lastRead", 0);
     }
 
-    public void setLocalPath(String url) {
+    public void setLocalPath(String name, ArrayList<String> urls) {
         mSourceType = SourceType.LOCAL;
-        path = url;
-        title = url.substring(url.lastIndexOf("\\") + 1);
+        path = name;
+        title = name.substring(name.lastIndexOf("\\") + 1);
+        if (TextUtils.isEmpty(title)) {
+            title = name.substring(name.lastIndexOf("/") + 1);
+
+        }
+        title= ReplaceUtil.getWordAgain(title);
+        title=ReplaceUtil.noNum(title);
         stage.setTitle(title);
 
         receiveProgress();
-        paths = FileSpider.getInstance().getMangaDetail(url);
+        paths = urls;
         toPage(currentPosition);
     }
 
@@ -287,7 +300,7 @@ public class ReadController extends BaseController implements Initializable {
         path = url;
         title = mangaName;
         chapterPos = chapterPosition;
-        stage.setTitle(title+Configure.LOADING);
+        stage.setTitle(title + Configure.LOADING);
 
         receiveProgress();
         spider.getMangaChapterPics(url, new JsoupCallBack<ArrayList<String>>() {

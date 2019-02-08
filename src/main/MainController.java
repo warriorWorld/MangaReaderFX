@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
 
@@ -39,8 +40,13 @@ import listener.OnItemClickListener;
 import mangadetail.OnlineMangaDetailController;
 import mangalist.ItemMangaController;
 import read.ReadController;
+import sort.FileComparator;
+import sort.FileComparatorAllNum;
+import sort.FileComparatorDirectory;
+import sort.FileComparatorWithBracket;
 import spider.FileSpider;
 import spider.SpiderBase;
+import utils.ReplaceUtil;
 import utils.ShareObjUtil;
 
 public class MainController extends BaseController implements Initializable {
@@ -65,6 +71,8 @@ public class MainController extends BaseController implements Initializable {
     private int currentPage = 1;
     private int stackPaneWidth = 0;
     private OnlineMangaDetailController onlineMangaDetailcontroller;
+    private ArrayList<String> pathList;//本地图片地址
+    private int currentScenePos = 0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -209,7 +217,7 @@ public class MainController extends BaseController implements Initializable {
                 }
             });
             backBtn.setOnAction(event -> {
-                toggleContent(0);
+                toggleContent(currentScenePos);
             });
             toggleContent(0);
         } catch (Exception e) {
@@ -218,6 +226,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     private void toggleContent(int position) {
+        currentScenePos = position;
         previousBtn.setVisible(false);
         pageTf.setVisible(false);
         nextBtn.setVisible(false);
@@ -258,7 +267,7 @@ public class MainController extends BaseController implements Initializable {
             doGetData(1);
         }
         //刷新本地漫画地址
-        doGetLocalManga();
+        doGetLocalManga(Configure.getMangaDirectory());
     }
 
     private void doGetData(int page) {
@@ -285,20 +294,6 @@ public class MainController extends BaseController implements Initializable {
                 });
     }
 
-    private void doGetLocalManga() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                localMangaList = FileSpider.getInstance().getMangaList(Configure.getMangaDirectory());
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        initLocalList();
-                    }
-                });
-            }
-        }).start();
-    }
 
     private void initOnlinePaneUI() {
         onlineScrollPane = new ScrollPane();
@@ -346,6 +341,107 @@ public class MainController extends BaseController implements Initializable {
         localScrollPane.setContent(localGrid);
     }
 
+    private void doGetLocalManga(String url) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                localMangaList = FileSpider.getInstance().getMangaList(url);
+                sortFiles();
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        initLocalList();
+                    }
+                });
+            }
+        }).start();
+    }
+
+    //给本地图片文件夹及图片排序
+    private void sortFiles() {
+        pathList = new ArrayList<>();
+        for (int i = 0; i < localMangaList.size(); i++) {
+            pathList.add(localMangaList.get(i).getLocalThumbnailUrl());
+        }
+
+        if (!isNextDirectory(localMangaList.get(0).getUrl())) {
+            //阅读页的前一页
+            //获取第一张图片的路径
+            String firstImgName = pathList.get(0);
+            if (firstImgName.contains(".jpg") || firstImgName.contains(".png") || firstImgName.contains(".bmp")) {
+                firstImgName = firstImgName.substring(0, firstImgName.length() - 1 - 3);
+            } else if (firstImgName.contains(".jpeg")) {
+                firstImgName = firstImgName.substring(0, firstImgName.length() - 1 - 4);
+            }
+            String[] arr = firstImgName.split("_");
+            if (arr.length == 0) {
+                arr = firstImgName.split("-");
+            }
+
+            if (pathList.get(0).contains("_") ||
+                    pathList.get(0).contains("-")) {
+                //正常的漫画
+                if (arr.length != 3) {
+                    return;
+                }
+                FileComparator comparator = new FileComparator();
+                Collections.sort(pathList, comparator);
+            } else if (pathList.get(0).contains("(")) {
+                FileComparatorWithBracket comparator1 = new FileComparatorWithBracket();
+                Collections.sort(pathList, comparator1);
+            } else {
+                String[] arri = firstImgName.split("/");
+                //最终获得图片名字
+                firstImgName = arri[arri.length - 1];
+                try {
+                    //用于判断是否位数字的异教徒写法
+                    int isInt = Integer.valueOf(firstImgName);
+                    //没抛出异常 所以是纯数字
+                    FileComparatorAllNum comparator2 = new FileComparatorAllNum();
+                    Collections.sort(pathList, comparator2);
+                } catch (NumberFormatException e) {
+
+                }
+            }
+            //将得到的排序结果给mangaList
+            for (int i = 0; i < pathList.size(); i++) {
+                localMangaList.get(i).setLocalThumbnailUrl(pathList.get(i));
+                localMangaList.get(i).setName((i + 1) + "");
+            }
+        } else {
+            //有很多话的漫画的文件夹层
+            try {
+                String firstDirectoryName = pathList.get(0);
+                String[] arri = firstDirectoryName.split("/");
+
+                firstDirectoryName = arri[arri.length - 2];
+                String[] arri1 = firstDirectoryName.split("-");
+                firstDirectoryName = arri1[0];
+                firstDirectoryName = ReplaceUtil.onlyNumber(firstDirectoryName);
+
+                //用于判断是否位数字的异教徒写法
+                int isInt = Integer.valueOf(firstDirectoryName);
+                //没抛出异常 所以是纯数字
+                FileComparatorDirectory comparator4 = new FileComparatorDirectory();
+                Collections.sort(localMangaList, comparator4);
+            } catch (Exception e) {
+                //假设有异常就不是有很多话的漫画的文件夹层
+            }
+        }
+    }
+
+    private boolean isNextDirectory(String path) {
+        File f = new File(path);
+        if (!f.exists()) {
+            return false;
+        }
+        if (f.isDirectory()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private void initLocalList() {
         try {
             localGrid.getChildren().clear();
@@ -361,11 +457,37 @@ public class MainController extends BaseController implements Initializable {
                 itemController.setOnClickListener(i, new OnItemClickListener() {
                     @Override
                     public void onClick(int position) {
+                        if (isNextDirectory(localMangaList.get(position).getUrl())) {
+                            doGetLocalManga(localMangaList.get(position).getUrl());
+                        } else {
+                            openReadManga(position);
+                        }
                     }
                 });
                 localGrid.add(item, (i % column), (int) (i / column));
             }
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void openReadManga(int position) {
+        try {
+            Stage window = new Stage();
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/read.fxml"));
+            Parent root = fxmlLoader.load();
+            //如果使用 Parent root = FXMLLoader.load(...) 静态读取方法，无法获取到Controller的实例对象
+            ReadController controller = fxmlLoader.getController(); //获取Controller的实例对象
+            Scene scene = new Scene(root, 800, 500);
+
+            window.setTitle(Configure.NAME);
+            window.setMaximized(true);
+            window.setScene(scene);
+            window.show();
+            controller.setStage(window);
+            controller.setScene(scene);
+            controller.setLocalPath(localMangaList.get(position).getUrl(),pathList);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

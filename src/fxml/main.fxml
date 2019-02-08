@@ -42,6 +42,7 @@
                <children>
                   <Button fx:id="backBtn" mnemonicParsing="false" text="后退" />
                   <Region />
+                  <Button mnemonicParsing="false" text="刷新" />
                   <Button fx:id="previousBtn" mnemonicParsing="false" text="上一页" />
                   <TextField fx:id="pageTf" prefHeight="23.0" prefWidth="32.0" text="1" />
                   <Button fx:id="nextBtn" mnemonicParsing="false" text="下一页" />
