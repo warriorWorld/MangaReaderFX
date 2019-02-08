@@ -5,6 +5,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -37,6 +39,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import listener.EditResultListener;
 import listener.JsoupCallBack;
@@ -54,6 +57,7 @@ public class ReadController extends BaseController implements Initializable {
     public ScrollPane mScrollPane;
     public Label currentInputLb, currentPageLb;
     public MenuItem jumpMi;
+    public MenuItem imgPercentageMi;
     public CheckMenuItem closeTranslateCm;
     private String currentInput = "";
     private Clipboard mClipboard;
@@ -146,6 +150,21 @@ public class ReadController extends BaseController implements Initializable {
             }
         });
         closeTranslateCm.setSelected(mPreferences.getBoolean(ShareKeys.CLOSE_TRANSLATE, false));
+        imgPercentageMi.setOnAction(event -> {
+            EditDialog.display("设置图片缩放比例", "请输入缩放比例,大于1的正整数,如:120表示120%大小缩放", "确定", new EditResultListener() {
+                @Override
+                public void onResult(String result) {
+                    try {
+                        String[] res = result.split("\\-");
+//                        doDownload(Integer.valueOf(res[0])-1, Integer.valueOf(res[1])-1);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        AlertDialog.display("请按格式输入");
+                    }
+                }
+            });
+        });
+        mIv.setFitHeight( Screen.getPrimary().getVisualBounds().getHeight()*0.9);
     }
 
     private void translateWord(final String word) {

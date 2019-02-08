@@ -44,6 +44,7 @@
             <Menu mnemonicParsing="false" text="设置">
                <items>
                   <CheckMenuItem fx:id="closeTranslateCm" mnemonicParsing="false" text="关闭本地翻译弹窗" />
+                  <MenuItem fx:id="imgPercentageMi" mnemonicParsing="false" text="设置图片比例" />
                </items>
             </Menu>
           <Menu mnemonicParsing="false" text="关于">
