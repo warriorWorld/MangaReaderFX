@@ -55,6 +55,7 @@ public class MainController extends BaseController implements Initializable {
     public Button loginBtn;
     public Button registerBtn;
     public Button logoutBtn;
+    public Button refreshBtn;
     public TextField userNameTf;
     public PasswordField mPasswordField;
     public StackPane mStackPane;
@@ -218,8 +219,18 @@ public class MainController extends BaseController implements Initializable {
             });
             backBtn.setOnAction(event -> {
                 toggleContent(currentScenePos);
-                if (currentScenePos==1){
+                if (currentScenePos == 1) {
                     doGetLocalManga(Configure.getMangaDirectory());
+                }
+            });
+            refreshBtn.setOnAction(event -> {
+                switch (currentScenePos) {
+                    case 0:
+                        doGetData(currentPage);
+                        break;
+                    case 1:
+                        doGetLocalManga(Configure.getMangaDirectory());
+                        break;
                 }
             });
             toggleContent(0);
@@ -489,7 +500,7 @@ public class MainController extends BaseController implements Initializable {
             window.show();
             controller.setStage(window);
             controller.setScene(scene);
-            controller.setLocalPath(localMangaList.get(position).getUrl(),pathList);
+            controller.setLocalPath(localMangaList.get(position).getUrl(), pathList);
         } catch (Exception e) {
             e.printStackTrace();
         }

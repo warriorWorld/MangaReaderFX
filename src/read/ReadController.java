@@ -280,13 +280,17 @@ public class ReadController extends BaseController implements Initializable {
     public void setLocalPath(String name, ArrayList<String> urls) {
         mSourceType = SourceType.LOCAL;
         path = name;
-        title = name.substring(name.lastIndexOf("\\") + 1);
-        if (TextUtils.isEmpty(title)) {
-            title = name.substring(name.lastIndexOf("/") + 1);
-
+        try {
+            title = name.substring(name.lastIndexOf("\\") + 1);
+            if (TextUtils.isEmpty(title)) {
+                title = name.substring(name.lastIndexOf("/") + 1);
+            }
+            if (title.contains("_")){
+                title=title.substring(0,title.lastIndexOf("_"));
+            }
+        } catch (Exception e) {
+            title = name;
         }
-        title= ReplaceUtil.getWordAgain(title);
-        title=ReplaceUtil.noNum(title);
         stage.setTitle(title);
 
         receiveProgress();
