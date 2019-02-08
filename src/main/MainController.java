@@ -218,6 +218,9 @@ public class MainController extends BaseController implements Initializable {
             });
             backBtn.setOnAction(event -> {
                 toggleContent(currentScenePos);
+                if (currentScenePos==1){
+                    doGetLocalManga(Configure.getMangaDirectory());
+                }
             });
             toggleContent(0);
         } catch (Exception e) {
