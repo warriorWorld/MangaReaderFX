@@ -186,8 +186,12 @@ public class DownloadMangaManager {
         if (null != currentChapter) {
             return currentChapter;
         }
-        currentChapter = (DownloadChapterBean) ShareObjUtil.getObject(ShareKeys.CURRENT_CHAPTER_KEY);
-        return currentChapter;
+        try {
+            currentChapter = (DownloadChapterBean) ShareObjUtil.getObject(ShareKeys.CURRENT_CHAPTER_KEY);
+            return currentChapter;
+        }catch (Exception e){
+            return null;
+        }
     }
 
     public void saveCurrentChapter() {

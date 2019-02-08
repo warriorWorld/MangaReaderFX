@@ -39,6 +39,7 @@ import listener.OnItemClickListener;
 import mangadetail.OnlineMangaDetailController;
 import mangalist.ItemMangaController;
 import read.ReadController;
+import spider.FileSpider;
 import spider.SpiderBase;
 import utils.ShareObjUtil;
 
@@ -54,12 +55,12 @@ public class MainController extends BaseController implements Initializable {
     public Label userNameLb;
     public MenuItem directoryChooserMi;
     private Parent optionsRoot, mangaDetailRoot;
-    private ScrollPane onlineScrollPane;
-    private GridPane onlineGrid;
+    private ScrollPane onlineScrollPane, localScrollPane;
+    private GridPane onlineGrid, localGrid;
     public Button previousBtn;
     public Button nextBtn;
     public TextField pageTf;
-    private ArrayList<MangaBean> currentMangaList = new ArrayList<>();
+    private ArrayList<MangaBean> currentMangaList = new ArrayList<>(), localMangaList = new ArrayList<>();
     private SpiderBase spider;
     private int currentPage = 1;
     private int stackPaneWidth = 0;
@@ -68,13 +69,18 @@ public class MainController extends BaseController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
+            //设置
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/options.fxml"));
             optionsRoot = fxmlLoader.load();
+            //线上漫画
             initOnlinePaneUI();
+            //线上漫画详情
             FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("/fxml/manga_detail.fxml"));
             mangaDetailRoot = fxmlLoader1.load();
             //如果使用 Parent root = FXMLLoader.load(...) 静态读取方法，无法获取到Controller的实例对象
             onlineMangaDetailcontroller = fxmlLoader1.getController(); //获取Controller的实例对象
+            //本地漫画
+            initLocalPaneUI();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -172,8 +178,8 @@ public class MainController extends BaseController implements Initializable {
                 chooser.setInitialDirectory(new File("C:\\Users\\Administrator"));   //设置初始路径，默认为我的电脑
                 chooser.setTitle("选择漫画保存文件夹");                //设置窗口标题
                 try {
-                    Preferences mPreferences=Preferences.userRoot();
-                    mPreferences.put(ShareKeys.MANGA_DIRECTORY_KEY,chooser.showDialog(stage).toString().replaceAll("\\\\","/"));
+                    Preferences mPreferences = Preferences.userRoot();
+                    mPreferences.put(ShareKeys.MANGA_DIRECTORY_KEY, chooser.showDialog(stage).toString().replaceAll("\\\\", "/"));
                 } catch (NullPointerException ex) {
                     ex.printStackTrace();
                 }
@@ -223,6 +229,10 @@ public class MainController extends BaseController implements Initializable {
                 mStackPane.getChildren().clear();
                 mStackPane.getChildren().add(onlineScrollPane);
                 break;
+            case 1:
+                mStackPane.getChildren().clear();
+                mStackPane.getChildren().add(localScrollPane);
+                break;
             case 6:
                 break;
             case 8:
@@ -236,6 +246,7 @@ public class MainController extends BaseController implements Initializable {
     public void setScene(Scene scene) {
         super.setScene(scene);
         onlineMangaDetailcontroller.setScene(scene);
+        //刷新线上漫画列表
         if (null != ShareObjUtil.getObject(ShareKeys.MAIN_PAGE_CHCHE)) {
             try {
                 currentMangaList = (ArrayList<MangaBean>) ShareObjUtil.getObject(ShareKeys.MAIN_PAGE_CHCHE);
@@ -246,6 +257,8 @@ public class MainController extends BaseController implements Initializable {
         } else {
             doGetData(1);
         }
+        //刷新本地漫画地址
+        doGetLocalManga();
     }
 
     private void doGetData(int page) {
@@ -270,6 +283,21 @@ public class MainController extends BaseController implements Initializable {
                         AlertDialog.display("错误", error, "确定");
                     }
                 });
+    }
+
+    private void doGetLocalManga() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                localMangaList = FileSpider.getInstance().getMangaList(Configure.getMangaDirectory());
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        initLocalList();
+                    }
+                });
+            }
+        }).start();
     }
 
     private void initOnlinePaneUI() {
@@ -303,6 +331,39 @@ public class MainController extends BaseController implements Initializable {
                     }
                 });
                 onlineGrid.add(item, (i % column), (int) (i / column));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initLocalPaneUI() {
+        localScrollPane = new ScrollPane();
+        localGrid = new GridPane();
+        localGrid.setPadding(new Insets(10, 10, 10, 10));
+        localGrid.setVgap(8);
+        localGrid.setHgap(10);
+        localScrollPane.setContent(localGrid);
+    }
+
+    private void initLocalList() {
+        try {
+            localGrid.getChildren().clear();
+            stackPaneWidth = (int) (scene.getWidth() - menuLv.getWidth());
+            int column = (int) (stackPaneWidth / 200) - 1;
+            for (int i = 0; i < localMangaList.size(); i++) {
+                FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("/fxml/item_manga_list.fxml"));
+                Parent item = fxmlLoader1.load();
+                ItemMangaController itemController = fxmlLoader1.getController();
+                MangaBean mangaItem = localMangaList.get(i);
+                itemController.setLocalThumbil(new File(mangaItem.getLocalThumbnailUrl()).toURI().toURL().toString());
+                itemController.setMangaName(mangaItem.getName());
+                itemController.setOnClickListener(i, new OnItemClickListener() {
+                    @Override
+                    public void onClick(int position) {
+                    }
+                });
+                localGrid.add(item, (i % column), (int) (i / column));
             }
         } catch (IOException e) {
             e.printStackTrace();

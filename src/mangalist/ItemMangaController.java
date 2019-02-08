@@ -49,7 +49,9 @@ public class ItemMangaController extends BaseController implements Initializable
         }).start();
     }
 
-
+    public void setLocalThumbil(String img) {
+        mangaIv.setImage(new Image(img));
+    }
 
     public void setMangaName(String text) {
         mangaNameLb.setText(text);
