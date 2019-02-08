@@ -10,6 +10,14 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class AlertDialog {
+    public static void display(String message) {
+        display("通知", message, "确定");
+    }
+
+    public static void display(String title, String message) {
+        display(title, message, "确定");
+    }
+
     public static void display(String title, String message, String okText) {
         Stage window = new Stage();
 
@@ -18,7 +26,7 @@ public class AlertDialog {
         window.setMinWidth(300);
         Label messageLb = new Label(message);
         Button closeBtn = new Button(okText);
-        closeBtn.setPadding(new Insets(5,10,5,10));
+        closeBtn.setPadding(new Insets(5, 10, 5, 10));
         closeBtn.setOnAction(event -> {
             window.close();
         });
@@ -26,7 +34,7 @@ public class AlertDialog {
         VBox vBox = new VBox(20);
         vBox.getChildren().addAll(messageLb, closeBtn);
         vBox.setAlignment(Pos.CENTER);
-        vBox.setPadding(new Insets(20,20,20,20));
+        vBox.setPadding(new Insets(20, 20, 20, 20));
 
         Scene scene = new Scene(vBox);
         window.setScene(scene);

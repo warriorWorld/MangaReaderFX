@@ -3,6 +3,7 @@ package okhttp;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import dialog.AlertDialog;
 import javafx.application.Platform;
@@ -75,5 +76,39 @@ public class HttpService {
 
     public <ResultObj> void requestGetData(String url, Class<ResultObj> objClass, HttpBack callBackInterface) {
         requestData(url, null, objClass, callBackInterface);
+    }
+
+    public void downloadFile(String url, HttpBack<InputStream> callBackInterface) {
+        Request request;
+        request = new Request.Builder()
+                .url(url)
+                .build();
+        OkHttpClient client = new OkHttpClient();
+        Call call = client.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Update UI here.
+                        AlertDialog.display("Post Failed", e.toString(), "知道了");
+                        callBackInterface.loadFailed(e.toString());
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                //将响应数据转化为输入流数据
+                InputStream inputStream=response.body().byteStream();
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        callBackInterface.loadSucceed(inputStream);
+                    }
+                });
+            }
+        });
     }
 }

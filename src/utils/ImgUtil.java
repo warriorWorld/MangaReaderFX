@@ -1,10 +1,15 @@
 package utils;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import javax.imageio.ImageIO;
+
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 
 public class ImgUtil {
@@ -22,6 +27,16 @@ public class ImgUtil {
 
         try (InputStream stream = conn.getInputStream()) {
             return new Image(stream);
+        }
+    }
+
+    public static void saveToFile(Image image,String path) {
+        File outputFile = new File(path);
+        BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
+        try {
+            ImageIO.write(bImage, "png", outputFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -10,6 +10,7 @@ import bean.ChapterBean;
 import bean.MangaBean;
 import configure.Configure;
 import dialog.AlertDialog;
+import download.DownloadMangaManager;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -39,12 +40,18 @@ public class OnlineMangaDetailController extends BaseController implements Initi
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        initUI();
+    }
 
+    private void initUI() {
+        collectBtn.setOnAction(event -> {
+            DownloadMangaManager.getInstance().download1Img("http://ww3.sinaimg.cn/mw600/0073ob6Pgy1fzyxg5dy1gj30gr0p9wol.jpg");
+        });
     }
 
     public void setUrl(String url, SpiderBase spider) {
-        stage.setTitle(Configure.NAME+Configure.LOADING);
-        this.spider=spider;
+        stage.setTitle(Configure.NAME + Configure.LOADING);
+        this.spider = spider;
         spider.getMangaDetail(url, new JsoupCallBack<MangaBean>() {
             @Override
             public void loadSucceed(final MangaBean result) {
@@ -114,7 +121,7 @@ public class OnlineMangaDetailController extends BaseController implements Initi
             button.setPrefWidth(90);
             ChapterBean item = currentManga.getChapters().get(i);
             button.setText("第" + item.getChapterPosition() + "话");
-            final int pos=i;
+            final int pos = i;
             button.setOnAction(event -> {
                 openReadManga(pos);
             });
@@ -137,7 +144,7 @@ public class OnlineMangaDetailController extends BaseController implements Initi
             window.show();
             controller.setStage(window);
             controller.setScene(scene);
-            controller.setOnlinePath(currentManga.getChapters().get(position).getChapterUrl(),currentManga.getName(),position,spider);
+            controller.setOnlinePath(currentManga.getChapters().get(position).getChapterUrl(), currentManga.getName(), position, spider);
         } catch (Exception e) {
             e.printStackTrace();
         }
