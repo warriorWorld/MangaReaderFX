@@ -13,6 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import listener.OnClickListener;
 import listener.OnItemClickListener;
@@ -32,15 +33,15 @@ public class ItemMangaController extends BaseController implements Initializable
             @Override
             public void run() {
 //                Image image = new Image(img);
-                    final Image image;
-                    image = ImgUtil.createImage(img);
+                final Image image;
+                image = ImgUtil.createImage(img);
 
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            mangaIv.setImage(image);
-                        }
-                    });
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        mangaIv.setImage(image);
+                    }
+                });
             }
         }).start();
     }
@@ -53,13 +54,21 @@ public class ItemMangaController extends BaseController implements Initializable
         mangaNameLb.setText(text);
     }
 
+
     public void setOnClickListener(int position, OnItemClickListener listener) {
         mangaIv.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if (event.getButton().toString().equals("PRIMARY")) {
+                if (null != listener) {
+                    listener.onMouseEvent(position,event);
+                }
+                if (event.getButton() == MouseButton.PRIMARY) {
                     if (null != listener) {
                         listener.onClick(position);
+                    }
+                } else if (event.getButton() == MouseButton.SECONDARY) {
+                    if (null != listener) {
+                        listener.onRightClick(position);
                     }
                 }
             }

@@ -15,6 +15,7 @@ import configure.BaseParameterUtil;
 import configure.Configure;
 import configure.ShareKeys;
 import dialog.AlertDialog;
+import dialog.EditDialog;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -26,6 +27,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
@@ -34,11 +36,13 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import listener.EditResultListener;
 import listener.JsoupCallBack;
 import listener.OnItemClickListener;
 import mangadetail.OnlineMangaDetailController;
@@ -80,6 +84,8 @@ public class MainController extends BaseController implements Initializable {
     private ArrayList<String> pathList;//本地图片地址
     private int currentScenePos = 0;
     private ArrayList<String> histroyPath = new ArrayList<>();
+    private String deleteTargetPath = "";
+    private ContextMenu itemCm;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -267,16 +273,28 @@ public class MainController extends BaseController implements Initializable {
                         switch (searchTypeCb.getSelectionModel().getSelectedIndex()) {
                             case 0:
                             default:
-                                type=SpiderBase.SearchType.BY_MANGA_NAME;
+                                type = SpiderBase.SearchType.BY_MANGA_NAME;
                                 break;
                             case 1:
-                                type=SpiderBase.SearchType.BY_MANGA_AUTHOR;
+                                type = SpiderBase.SearchType.BY_MANGA_AUTHOR;
                                 break;
                         }
-                        doGetSearchData(type,searchTf.getText());
+                        doGetSearchData(type, searchTf.getText());
                     }
                 }
             });
+            MenuItem deteleMi = new MenuItem("删除图片");
+            deteleMi.setOnAction(event -> {
+                EditDialog.display("确定删除该文件夹吗?", "请输入delete,然后确定.", "确定删除", new EditResultListener() {
+                    @Override
+                    public void onResult(String result) {
+                        FileSpider.deleteFile(new File(deleteTargetPath));
+                        doGetLocalManga(Configure.getMangaDirectory());
+                    }
+                });
+            });
+            itemCm = new ContextMenu();
+            itemCm.getItems().add(deteleMi);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -413,6 +431,16 @@ public class MainController extends BaseController implements Initializable {
                         mStackPane.getChildren().add(mangaDetailRoot);
                         onlineMangaDetailcontroller.setStackPaneWidth(stackPaneWidth);
                         onlineMangaDetailcontroller.setUrl(currentMangaList.get(position).getUrl(), spider);
+                    }
+
+                    @Override
+                    public void onRightClick(int position) {
+
+                    }
+
+                    @Override
+                    public void onMouseEvent(int position, MouseEvent event) {
+
                     }
                 });
                 onlineGrid.add(item, (i % column), (int) (i / column));
@@ -566,6 +594,19 @@ public class MainController extends BaseController implements Initializable {
                     public void onClick(int position) {
                         if (isNextDirectory(localMangaList.get(position).getUrl())) {
                             doGetLocalManga(localMangaList.get(position).getUrl());
+                        }
+                    }
+
+                    @Override
+                    public void onRightClick(int position) {
+
+                    }
+
+                    @Override
+                    public void onMouseEvent(int position, MouseEvent event) {
+                        if (event.getButton() == MouseButton.SECONDARY) {
+                            deleteTargetPath = localMangaList.get(position).getUrl();
+                            itemCm.show(stage, event.getScreenX(), event.getScreenY());
                         }
                     }
                 });
