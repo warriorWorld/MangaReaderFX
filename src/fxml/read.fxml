@@ -19,7 +19,7 @@
          <content>
             <StackPane prefHeight="669.0" prefWidth="894.0">
                <children>
-                  <ImageView fx:id="mIv" onScroll="#handleZoom" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER" />
+                  <ImageView fx:id="mIv" onZoom="#handleZoom" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER" />
                </children>
             </StackPane>
          </content>

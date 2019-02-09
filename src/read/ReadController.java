@@ -32,12 +32,14 @@ import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -67,6 +69,7 @@ public class ReadController extends BaseController implements Initializable {
     private SourceType mSourceType;
     private HashMap<Integer, Image> cacheList = new HashMap<>();
     private int chapterPos = 0;
+    private ContextMenu imageCm;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -120,6 +123,19 @@ public class ReadController extends BaseController implements Initializable {
                 nextPage();
             } else if (event.getCode().toString().equals("LEFT")) {
                 previousPage();
+            } else if (event.getCode().toString().equals("SPACE")) {
+                event.consume();
+                currentInput += " ";
+            }
+        });
+        mIv.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    imageCm.show(stage, event.getScreenX(), event.getScreenY());
+                } else {
+                    imageCm.hide();
+                }
             }
         });
     }
@@ -158,12 +174,12 @@ public class ReadController extends BaseController implements Initializable {
         });
         closeTranslateCm.setSelected(mPreferences.getBoolean(ShareKeys.CLOSE_TRANSLATE, false));
         imgPercentageMi.setOnAction(event -> {
-            EditDialog.display("设置图片缩放比例", "请输入缩放比例,大于1的正整数,如:120表示120%大小缩放", "确定", new EditResultListener() {
+            EditDialog.display("设置图片缩放比例", "请输入缩放比例,如:1.2表示按1.2倍大小缩放", "确定", new EditResultListener() {
                 @Override
                 public void onResult(String result) {
                     try {
-                        String[] res = result.split("\\-");
-//                        doDownload(Integer.valueOf(res[0])-1, Integer.valueOf(res[1])-1);
+                        double rate = Double.valueOf(result);
+                        mIv.setFitHeight(mIv.getFitHeight() * rate);
                     } catch (Exception e) {
                         e.printStackTrace();
                         AlertDialog.display("请按格式输入");
@@ -171,7 +187,21 @@ public class ReadController extends BaseController implements Initializable {
                 }
             });
         });
-        mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.9);
+        mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.92);
+        imageCm = new ContextMenu();
+        MenuItem magnifyMi = new MenuItem("放大");
+        magnifyMi.setOnAction(event -> {
+            mIv.setFitHeight(mIv.getFitHeight() * 1.1);
+        });
+        MenuItem shrinkMi =  new MenuItem("缩小");
+        shrinkMi.setOnAction(event -> {
+            mIv.setFitHeight(mIv.getFitHeight() * 0.9);
+        });
+        MenuItem recoverMi =  new MenuItem("恢复大小");
+        recoverMi.setOnAction(event -> {
+            mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.92);
+        });
+        imageCm.getItems().addAll(magnifyMi, shrinkMi, recoverMi, new MenuItem("保存图片"), new MenuItem("删除图片"));
     }
 
     private void translateWord(final String word) {
