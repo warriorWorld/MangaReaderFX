@@ -587,7 +587,11 @@ public class MainController extends BaseController implements Initializable {
                 Parent item = fxmlLoader1.load();
                 ItemMangaController itemController = fxmlLoader1.getController();
                 MangaBean mangaItem = localMangaList.get(i);
-                itemController.setLocalThumbil(new File(mangaItem.getLocalThumbnailUrl()).toURI().toURL().toString());
+                try {
+                    itemController.setLocalThumbil(new File(mangaItem.getLocalThumbnailUrl()).toURI().toURL().toString());
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
                 itemController.setMangaName(mangaItem.getName());
                 itemController.setOnClickListener(i, new OnItemClickListener() {
                     @Override
