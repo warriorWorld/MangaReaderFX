@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.prefs.Preferences;
@@ -25,6 +26,7 @@ import configure.Configure;
 import configure.ShareKeys;
 import dialog.AlertDialog;
 import dialog.EditDialog;
+import download.DownloadMangaManager;
 import enums.SourceType;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -70,6 +72,7 @@ public class ReadController extends BaseController implements Initializable {
     private HashMap<Integer, Image> cacheList = new HashMap<>();
     private int chapterPos = 0;
     private ContextMenu imageCm;
+    private MenuItem magnifyMi, shrinkMi, recoverMi, deteleMi, saveMi;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -189,19 +192,32 @@ public class ReadController extends BaseController implements Initializable {
         });
         mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.92);
         imageCm = new ContextMenu();
-        MenuItem magnifyMi = new MenuItem("放大");
+        magnifyMi = new MenuItem("放大");
         magnifyMi.setOnAction(event -> {
             mIv.setFitHeight(mIv.getFitHeight() * 1.1);
         });
-        MenuItem shrinkMi =  new MenuItem("缩小");
+        shrinkMi = new MenuItem("缩小");
         shrinkMi.setOnAction(event -> {
             mIv.setFitHeight(mIv.getFitHeight() * 0.9);
         });
-        MenuItem recoverMi =  new MenuItem("恢复大小");
+        recoverMi = new MenuItem("恢复大小");
         recoverMi.setOnAction(event -> {
             mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.92);
         });
-        imageCm.getItems().addAll(magnifyMi, shrinkMi, recoverMi, new MenuItem("保存图片"), new MenuItem("删除图片"));
+        deteleMi = new MenuItem("删除图片");
+        deteleMi.setOnAction(event -> {
+            FileSpider.deleteFile(new File(paths.get(currentPosition)));
+            paths.remove(currentPosition);
+            toPage(currentPosition);
+        });
+        saveMi = new MenuItem("保存图片");
+        saveMi.setOnAction(event -> {
+            Long time = new Date().getTime();
+            String timeString = time + "";
+            timeString = timeString.substring(5);
+            DownloadMangaManager.getInstance().downloadImg(paths.get(currentPosition), "UserSaved/userSaved(" + timeString + ").png");
+            AlertDialog.display("已保存,返回后刷新可见.");
+        });
     }
 
     private void translateWord(final String word) {
@@ -327,6 +343,7 @@ public class ReadController extends BaseController implements Initializable {
 
     public void setLocalPath(String name, ArrayList<String> urls) {
         mSourceType = SourceType.LOCAL;
+        imageCm.getItems().addAll(magnifyMi, shrinkMi, recoverMi, deteleMi);
         path = name;
         try {
             title = name.substring(name.lastIndexOf("\\") + 1);
@@ -347,8 +364,8 @@ public class ReadController extends BaseController implements Initializable {
     }
 
     public void setOnlinePath(String url, String mangaName, int chapterPosition, SpiderBase spider) {
-
         mSourceType = SourceType.ONLINE;
+        imageCm.getItems().addAll(magnifyMi, shrinkMi, recoverMi, saveMi);
         path = url;
         title = mangaName;
         chapterPos = chapterPosition;

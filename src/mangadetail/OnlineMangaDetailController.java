@@ -49,7 +49,6 @@ public class OnlineMangaDetailController extends BaseController implements Initi
 
     private void initUI() {
         collectBtn.setOnAction(event -> {
-            DownloadMangaManager.getInstance().download1Img("http://ww3.sinaimg.cn/mw600/0073ob6Pgy1fzyxg5dy1gj30gr0p9wol.jpg", "/test/test.png");
         });
         downloadAllBtn.setOnAction(event -> {
             downloadAll();

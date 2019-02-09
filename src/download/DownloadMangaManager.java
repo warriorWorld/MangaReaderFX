@@ -113,19 +113,33 @@ public class DownloadMangaManager {
         }
     }
 
-    public void download1Img(String imgUrl, String fileName) {
+    private void download1Img(String imgUrl, String fileName) {
         if (stopDownload) {
             return;
         }
         new Thread(new Runnable() {
             @Override
             public void run() {
-                    final Image image;
-                    image = ImgUtil.createImage(imgUrl);
-                    ImgUtil.saveToFile(image, Configure.getMangaDirectory() + "/"+fileName);
-                    refreshCurrentPagesInfo(imgUrl);
-                    download1Img(currentChapter.getPages().get(0).getPage_url(), mangaName + "/" +
-                            currentChapter.getChapter_child_folder_name() + "/" + currentChapter.getPages().get(0).getPage_file_name());
+                final Image image;
+                image = ImgUtil.createImage(imgUrl);
+                ImgUtil.saveToFile(image, Configure.getMangaDirectory() + "/" + fileName);
+                refreshCurrentPagesInfo(imgUrl);
+                download1Img(currentChapter.getPages().get(0).getPage_url(), mangaName + "/" +
+                        currentChapter.getChapter_child_folder_name() + "/" + currentChapter.getPages().get(0).getPage_file_name());
+            }
+        }).start();
+    }
+
+    public void downloadImg(String imgUrl, String fileName) {
+        if (stopDownload) {
+            return;
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final Image image;
+                image = ImgUtil.createImage(imgUrl);
+                ImgUtil.saveToFile(image, Configure.getMangaDirectory() + "/" + fileName);
             }
         }).start();
     }
@@ -185,7 +199,7 @@ public class DownloadMangaManager {
         try {
             currentChapter = (DownloadChapterBean) ShareObjUtil.getObject(ShareKeys.CURRENT_CHAPTER_KEY);
             return currentChapter;
-        }catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
