@@ -283,9 +283,9 @@ public class MainController extends BaseController implements Initializable {
                     }
                 }
             });
-            MenuItem deteleMi = new MenuItem("删除图片");
+            MenuItem deteleMi = new MenuItem("删除漫画");
             deteleMi.setOnAction(event -> {
-                EditDialog.display("确定删除该文件夹吗?", "请输入delete,然后确定.", "确定删除", new EditResultListener() {
+                EditDialog.display("确定删除该漫画吗?", "请输入delete,然后确定.", "确定删除", new EditResultListener() {
                     @Override
                     public void onResult(String result) {
                         FileSpider.deleteFile(new File(deleteTargetPath));
