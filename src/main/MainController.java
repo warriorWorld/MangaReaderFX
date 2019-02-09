@@ -100,7 +100,7 @@ public class MainController extends BaseController implements Initializable {
             e.printStackTrace();
         }
         initUI();
-        initSpider("KaKaLot");
+        initSpider(BaseParameterUtil.getInstance().getCurrentWebSite());
     }
 
     @Override
@@ -312,15 +312,17 @@ public class MainController extends BaseController implements Initializable {
         } else {
             doGetData(1);
         }
+        currentPage=BaseParameterUtil.getInstance().getCurrentPage()/spider.nextPageNeedAddCount();
+        pageTf.setText(currentPage+"");
         //刷新本地漫画地址
         doGetLocalManga(Configure.getMangaDirectory());
     }
 
     private void doGetData(int page) {
-        BaseParameterUtil.getInstance().saveCurrentPage(page);
+        BaseParameterUtil.getInstance().saveCurrentPage(page*spider.nextPageNeedAddCount());
         stage.setTitle(Configure.NAME + Configure.LOADING);
         spider.getMangaList("all",
-                page + "", new JsoupCallBack<MangaListBean>() {
+                (page*spider.nextPageNeedAddCount()) + "", new JsoupCallBack<MangaListBean>() {
                     @Override
                     public void loadSucceed(final MangaListBean result) {
                         Platform.runLater(new Runnable() {

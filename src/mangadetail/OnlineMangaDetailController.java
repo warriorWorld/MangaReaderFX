@@ -9,6 +9,7 @@ import base.BaseController;
 import bean.ChapterBean;
 import bean.DownloadBean;
 import bean.MangaBean;
+import configure.BaseParameterUtil;
 import configure.Configure;
 import dialog.AlertDialog;
 import dialog.EditDialog;
@@ -186,7 +187,7 @@ public class OnlineMangaDetailController extends BaseController implements Initi
         temp.setChapters(chapters);
         DownloadBean.getInstance().setMangaBean(temp);
         DownloadBean.getInstance().initDownloadChapters();
-        DownloadBean.getInstance().setWebSite("KaKaLot");
+        DownloadBean.getInstance().setWebSite(BaseParameterUtil.getInstance().getCurrentWebSite());
         DownloadMangaManager.getInstance().doDownload();
     }
 
