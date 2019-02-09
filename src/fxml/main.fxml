@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
@@ -15,7 +16,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="597.0" prefWidth="845.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.MainController">
+<BorderPane prefHeight="861.0" prefWidth="1196.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.MainController">
    <top>
       <VBox BorderPane.alignment="CENTER">
          <children>
@@ -46,6 +47,8 @@
                   <Button fx:id="previousBtn" mnemonicParsing="false" text="上一页" />
                   <TextField fx:id="pageTf" prefHeight="23.0" prefWidth="32.0" text="1" />
                   <Button fx:id="nextBtn" mnemonicParsing="false" text="下一页" />
+                  <Label text="切换站点" />
+                  <ChoiceBox fx:id="siteCb" prefWidth="150.0" />
                   <Region HBox.hgrow="ALWAYS" />
                   <TextField fx:id="userNameTf" promptText="账号" />
                   <PasswordField fx:id="mPasswordField" promptText="密码" />

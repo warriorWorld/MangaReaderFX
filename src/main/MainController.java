@@ -11,10 +11,13 @@ import java.util.prefs.Preferences;
 import base.BaseController;
 import bean.MangaBean;
 import bean.MangaListBean;
+import configure.BaseParameterUtil;
 import configure.Configure;
 import configure.ShareKeys;
 import dialog.AlertDialog;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -22,6 +25,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
@@ -61,6 +65,7 @@ public class MainController extends BaseController implements Initializable {
     public StackPane mStackPane;
     public Label userNameLb;
     public MenuItem directoryChooserMi;
+    public ChoiceBox<String> siteCb;
     private Parent optionsRoot, mangaDetailRoot;
     private ScrollPane onlineScrollPane, localScrollPane;
     private GridPane onlineGrid, localGrid;
@@ -239,6 +244,19 @@ public class MainController extends BaseController implements Initializable {
                 }
             });
             toggleContent(0);
+            siteCb.getItems().addAll(Configure.websList);
+            siteCb.setValue(Configure.websList[0]);
+          siteCb.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+              @Override
+              public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                  initSpider(newValue);
+                  currentPage=1;
+                  pageTf.setText(currentPage + "");
+                  doGetData(currentPage);
+                  BaseParameterUtil.getInstance().saveCurrentType( spider.getMangaTypes()[0]);
+                  BaseParameterUtil.getInstance().saveCurrentWebSite(newValue);
+              }
+          });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -299,6 +317,7 @@ public class MainController extends BaseController implements Initializable {
     }
 
     private void doGetData(int page) {
+        BaseParameterUtil.getInstance().saveCurrentPage(page);
         stage.setTitle(Configure.NAME + Configure.LOADING);
         spider.getMangaList("all",
                 page + "", new JsoupCallBack<MangaListBean>() {

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import base.BaseController;
 import bean.DownloadBean;
+import configure.BaseParameterUtil;
 import configure.Configure;
 import download.DownloadMangaManager;
 import javafx.application.Application;
@@ -17,7 +18,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        initDownloadManger();
+        initAllInstance();
 //        Parent root = FXMLLoader.load(getClass().getResource("read\\read.fxml"));
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
         Parent root = fxmlLoader.load();
@@ -33,9 +34,10 @@ public class Main extends Application {
         controller.setScene(scene);
     }
 
-    private void initDownloadManger() {
+    private void initAllInstance() {
         DownloadMangaManager.getInstance().getCurrentChapter();
         DownloadBean.getInstance().setDownloadInfo(DownloadBean.getInstance().getDownloadInfo());
+        BaseParameterUtil.getInstance();
     }
 
     /**
