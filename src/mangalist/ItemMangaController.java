@@ -32,7 +32,6 @@ public class ItemMangaController extends BaseController implements Initializable
             @Override
             public void run() {
 //                Image image = new Image(img);
-                try {
                     final Image image;
                     image = ImgUtil.createImage(img);
 
@@ -42,9 +41,6 @@ public class ItemMangaController extends BaseController implements Initializable
                             mangaIv.setImage(image);
                         }
                     });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
         }).start();
     }

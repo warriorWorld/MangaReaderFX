@@ -120,16 +120,12 @@ public class DownloadMangaManager {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
                     final Image image;
                     image = ImgUtil.createImage(imgUrl);
                     ImgUtil.saveToFile(image, Configure.getMangaDirectory() + "/"+fileName);
                     refreshCurrentPagesInfo(imgUrl);
                     download1Img(currentChapter.getPages().get(0).getPage_url(), mangaName + "/" +
                             currentChapter.getChapter_child_folder_name() + "/" + currentChapter.getPages().get(0).getPage_file_name());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
         }).start();
     }

@@ -99,7 +99,6 @@ public class OnlineMangaDetailController extends BaseController implements Initi
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
                     final Image image;
                     image = ImgUtil.createImage(currentManga.getWebThumbnailUrl());
 
@@ -109,9 +108,6 @@ public class OnlineMangaDetailController extends BaseController implements Initi
                             mangaIv.setImage(image);
                         }
                     });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
         }).start();
         Platform.runLater(new Runnable() {

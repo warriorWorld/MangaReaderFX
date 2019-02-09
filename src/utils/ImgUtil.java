@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -20,13 +21,18 @@ public class ImgUtil {
      * @return
      * @throws IOException
      */
-    public static Image createImage(String url)
-            throws IOException {
-        URLConnection conn = new URL(url).openConnection();
-        conn.setRequestProperty("User-Agent", "Wget/1.13.4 (linux-gnu)");
+    public static Image createImage(String url) {
+        try {
+            URLConnection conn = new URL(url).openConnection();
+            conn.setRequestProperty("User-Agent", "Wget/1.13.4 (linux-gnu)");
 
-        try (InputStream stream = conn.getInputStream()) {
-            return new Image(stream);
+            try (InputStream stream = conn.getInputStream()) {
+                return new Image(stream);
+            }
+        } catch (MalformedURLException e) {
+            return createImage("http://ww3.sinaimg.cn/mw600/006XNEY7gy1g002effyj2j30u0141qv5.jpg");
+        } catch (IOException e) {
+            return null;
         }
     }
 

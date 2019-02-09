@@ -171,7 +171,7 @@ public class ReadController extends BaseController implements Initializable {
                 }
             });
         });
-        mIv.setFitHeight( Screen.getPrimary().getVisualBounds().getHeight()*0.9);
+        mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.9);
     }
 
     private void translateWord(final String word) {
@@ -227,13 +227,9 @@ public class ReadController extends BaseController implements Initializable {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                try {
-                                    final Image image;
-                                    image = ImgUtil.createImage(paths.get(page + 1));
-                                    cacheList.put(page + 1, image);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                final Image image;
+                                image = ImgUtil.createImage(paths.get(page + 1));
+                                cacheList.put(page + 1, image);
                             }
                         }).start();
                     }
@@ -246,22 +242,18 @@ public class ReadController extends BaseController implements Initializable {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        try {
-                            final Image image;
-                            image = ImgUtil.createImage(paths.get(page));
-                            cacheList.put(page, image);
-                            Platform.runLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (page == currentPosition) {
-                                        mIv.setImage(image);
-                                        stage.setTitle(title);
-                                    }
+                        final Image image;
+                        image = ImgUtil.createImage(paths.get(page));
+                        cacheList.put(page, image);
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (page == currentPosition) {
+                                    mIv.setImage(image);
+                                    stage.setTitle(title);
                                 }
-                            });
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                            }
+                        });
                     }
                 }).start();
                 break;
@@ -311,8 +303,8 @@ public class ReadController extends BaseController implements Initializable {
             if (TextUtils.isEmpty(title)) {
                 title = name.substring(name.lastIndexOf("/") + 1);
             }
-            if (title.contains("_")){
-                title=title.substring(0,title.lastIndexOf("_"));
+            if (title.contains("_")) {
+                title = title.substring(0, title.lastIndexOf("_"));
             }
         } catch (Exception e) {
             title = name;

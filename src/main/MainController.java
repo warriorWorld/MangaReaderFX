@@ -60,12 +60,12 @@ public class MainController extends BaseController implements Initializable {
     public Button registerBtn;
     public Button logoutBtn;
     public Button refreshBtn;
-    public TextField userNameTf;
+    public TextField userNameTf, searchTf;
     public PasswordField mPasswordField;
     public StackPane mStackPane;
     public Label userNameLb;
     public MenuItem directoryChooserMi;
-    public ChoiceBox<String> siteCb;
+    public ChoiceBox<String> siteCb, searchTypeCb;
     private Parent optionsRoot, mangaDetailRoot;
     private ScrollPane onlineScrollPane, localScrollPane;
     private GridPane onlineGrid, localGrid;
@@ -246,17 +246,37 @@ public class MainController extends BaseController implements Initializable {
             toggleContent(0);
             siteCb.getItems().addAll(Configure.websList);
             siteCb.setValue(Configure.websList[0]);
-          siteCb.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-              @Override
-              public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                  initSpider(newValue);
-                  currentPage=1;
-                  pageTf.setText(currentPage + "");
-                  doGetData(currentPage);
-                  BaseParameterUtil.getInstance().saveCurrentType( spider.getMangaTypes()[0]);
-                  BaseParameterUtil.getInstance().saveCurrentWebSite(newValue);
-              }
-          });
+            siteCb.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+                @Override
+                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                    initSpider(newValue);
+                    currentPage = 1;
+                    pageTf.setText(currentPage + "");
+                    doGetData(currentPage);
+                    BaseParameterUtil.getInstance().saveCurrentType(spider.getMangaTypes()[0]);
+                    BaseParameterUtil.getInstance().saveCurrentWebSite(newValue);
+                }
+            });
+            searchTypeCb.getItems().addAll("按名称", "按作者");
+            searchTypeCb.setValue("按名称");
+            searchTf.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent event) {
+                    if (event.getCode().toString().equals("ENTER")) {
+                        SpiderBase.SearchType type;
+                        switch (searchTypeCb.getSelectionModel().getSelectedIndex()) {
+                            case 0:
+                            default:
+                                type=SpiderBase.SearchType.BY_MANGA_NAME;
+                                break;
+                            case 1:
+                                type=SpiderBase.SearchType.BY_MANGA_AUTHOR;
+                                break;
+                        }
+                        doGetSearchData(type,searchTf.getText());
+                    }
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -312,17 +332,17 @@ public class MainController extends BaseController implements Initializable {
         } else {
             doGetData(1);
         }
-        currentPage=BaseParameterUtil.getInstance().getCurrentPage()/spider.nextPageNeedAddCount();
-        pageTf.setText(currentPage+"");
+        currentPage = BaseParameterUtil.getInstance().getCurrentPage() / spider.nextPageNeedAddCount();
+        pageTf.setText(currentPage + "");
         //刷新本地漫画地址
         doGetLocalManga(Configure.getMangaDirectory());
     }
 
     private void doGetData(int page) {
-        BaseParameterUtil.getInstance().saveCurrentPage(page*spider.nextPageNeedAddCount());
+        BaseParameterUtil.getInstance().saveCurrentPage(page * spider.nextPageNeedAddCount());
         stage.setTitle(Configure.NAME + Configure.LOADING);
         spider.getMangaList("all",
-                (page*spider.nextPageNeedAddCount()) + "", new JsoupCallBack<MangaListBean>() {
+                (page * spider.nextPageNeedAddCount()) + "", new JsoupCallBack<MangaListBean>() {
                     @Override
                     public void loadSucceed(final MangaListBean result) {
                         Platform.runLater(new Runnable() {
@@ -343,6 +363,27 @@ public class MainController extends BaseController implements Initializable {
                 });
     }
 
+    private void doGetSearchData(SpiderBase.SearchType type, String keyWord) {
+        stage.setTitle(Configure.NAME + Configure.LOADING);
+        spider.getSearchResultList(type, keyWord, new JsoupCallBack<MangaListBean>() {
+            @Override
+            public void loadSucceed(final MangaListBean result) {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        stage.setTitle(Configure.NAME);
+                        currentMangaList = result.getMangaList();
+                        initOnlineList();
+                    }
+                });
+            }
+
+            @Override
+            public void loadFailed(String error) {
+
+            }
+        });
+    }
 
     private void initOnlinePaneUI() {
         onlineScrollPane = new ScrollPane();
