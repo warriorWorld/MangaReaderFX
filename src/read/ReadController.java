@@ -115,6 +115,13 @@ public class ReadController extends BaseController implements Initializable {
                 }
             }
         });
+        mScrollPane.setOnKeyPressed(event -> {
+            if (event.getCode().toString().equals("RIGHT")) {
+                nextPage();
+            } else if (event.getCode().toString().equals("LEFT")) {
+                previousPage();
+            }
+        });
     }
 
     private void initUI() {
