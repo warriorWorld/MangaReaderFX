@@ -16,6 +16,7 @@ import configure.Configure;
 import configure.ShareKeys;
 import dialog.AlertDialog;
 import dialog.EditDialog;
+import download.DownloadController;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -70,7 +71,7 @@ public class MainController extends BaseController implements Initializable {
     public Label userNameLb;
     public MenuItem directoryChooserMi;
     public ChoiceBox<String> siteCb, searchTypeCb;
-    private Parent optionsRoot, mangaDetailRoot;
+    private Parent optionsRoot, mangaDetailRoot,downloadRoot;
     private ScrollPane onlineScrollPane, localScrollPane;
     private GridPane onlineGrid, localGrid;
     public Button previousBtn;
@@ -81,6 +82,7 @@ public class MainController extends BaseController implements Initializable {
     private int currentPage = 1;
     private int stackPaneWidth = 0;
     private OnlineMangaDetailController onlineMangaDetailcontroller;
+    private DownloadController downloadController;
     private ArrayList<String> pathList;//本地图片地址
     private int currentScenePos = 0;
     private ArrayList<String> histroyPath = new ArrayList<>();
@@ -102,6 +104,11 @@ public class MainController extends BaseController implements Initializable {
             onlineMangaDetailcontroller = fxmlLoader1.getController(); //获取Controller的实例对象
             //本地漫画
             initLocalPaneUI();
+            //正在下载
+            FXMLLoader fxmlLoader2 = new FXMLLoader(getClass().getResource("/fxml/downloading.fxml"));
+            downloadRoot = fxmlLoader2.load();
+            //如果使用 Parent root = FXMLLoader.load(...) 静态读取方法，无法获取到Controller的实例对象
+            downloadController = fxmlLoader2.getController(); //获取Controller的实例对象
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -327,6 +334,10 @@ public class MainController extends BaseController implements Initializable {
                 mStackPane.getChildren().add(localScrollPane);
                 break;
             case 6:
+                break;
+            case 7:
+                mStackPane.getChildren().clear();
+                mStackPane.getChildren().add(downloadRoot);
                 break;
             case 8:
                 mStackPane.getChildren().clear();

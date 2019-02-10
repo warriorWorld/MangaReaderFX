@@ -183,6 +183,10 @@ public class DownloadMangaManager {
         stopDownload = true;
     }
 
+    public boolean isStopDownload() {
+        return stopDownload;
+    }
+
     public void reset() {
         stopDownload();
         DownloadBean.getInstance().clean();

@@ -12,6 +12,7 @@ import utils.TextUtils;
 
 public class Configure {
     public final static boolean isTest = true;
+    public final static String VERSION = "1.0";
     //数据库版本号
     public static final int DB_VERSION = 1;
     public final static String[] websList = {"KaKaLot", "MangaReader"};
