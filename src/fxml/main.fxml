@@ -34,7 +34,7 @@
                 </Menu>
               </menus>
             </MenuBar>
-            <HBox alignment="CENTER_RIGHT" spacing="8.0">
+            <HBox alignment="CENTER_RIGHT" spacing="8.0" style="-fx-border-color: #86C1B9;">
                <children>
                   <Button fx:id="backBtn" mnemonicParsing="false" text="后退" />
                   <Region />
@@ -62,9 +62,9 @@
       </VBox>
    </top>
    <left>
-      <ListView fx:id="menuLv" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <ListView fx:id="menuLv" prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: #86C1B9;" BorderPane.alignment="CENTER" />
    </left>
    <center>
-      <StackPane fx:id="mStackPane" BorderPane.alignment="CENTER" />
+      <StackPane fx:id="mStackPane" style="-fx-border-color: #86C1B9;" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>
