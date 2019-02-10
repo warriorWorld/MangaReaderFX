@@ -56,7 +56,7 @@ public class ItemMangaController extends BaseController implements Initializable
 
 
     public void setOnClickListener(int position, OnItemClickListener listener) {
-        mangaIv.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        EventHandler<MouseEvent> mouseEventEventHandler=new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if (null != listener) {
@@ -72,6 +72,8 @@ public class ItemMangaController extends BaseController implements Initializable
                     }
                 }
             }
-        });
+        };
+        mangaIv.setOnMouseClicked(mouseEventEventHandler);
+        mangaNameLb.setOnMouseClicked(mouseEventEventHandler);
     }
 }
