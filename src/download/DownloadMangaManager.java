@@ -2,10 +2,6 @@
 package download;
 
 
-import com.sun.imageio.plugins.common.ImageUtil;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 import bean.DownloadBean;
@@ -14,11 +10,8 @@ import bean.DownloadPageBean;
 import bean.MangaBean;
 import configure.Configure;
 import configure.ShareKeys;
-import dialog.AlertDialog;
 import javafx.scene.image.Image;
 import listener.JsoupCallBack;
-import okhttp.HttpBack;
-import okhttp.HttpService;
 import spider.SpiderBase;
 import utils.ImgUtil;
 import utils.ShareObjUtil;
@@ -32,8 +25,9 @@ import utils.ShareObjUtil;
 public class DownloadMangaManager {
     private DownloadChapterBean currentChapter;
     private SpiderBase spider;
-    private boolean stopDownload = false;
+    private boolean stopDownload = true;
     private String mangaName;
+    private DownloadController mDownloadController;
 
     private DownloadMangaManager() {
     }
@@ -51,6 +45,9 @@ public class DownloadMangaManager {
         return instance;
     }
 
+    public void setController(DownloadController downloadController) {
+        mDownloadController=downloadController;
+    }
 
     public void doDownload() {
         stopDownload = false;
@@ -60,10 +57,21 @@ public class DownloadMangaManager {
             //没有章节了
             //下载完成
             reset();
-//            EventBus.getDefault().post(new DownLoadEvent(EventBusEvent.DOWNLOAD_FINISH_EVENT));
+            if (null!=mDownloadController){
+                mDownloadController.toEmptyUI();
+            }
             return;
         }
         if (null == currentChapter || null == currentChapter.getPages()) {
+            if (null!=mDownloadController){
+                mDownloadController.refreshUI();
+                try {
+                    mDownloadController.addDownloaded("下载完成:  第" +
+                            DownloadMangaManager.getInstance().
+                                    getCurrentChapter().getChapter_title() + "话");
+                }catch (Exception e){
+                }
+            }
             //当前章节空了的时候 当前章节赋值为新的章节 移除空章节
             currentChapter = DownloadBean.getInstance().getDownload_chapters().get(0);
             saveCurrentChapter();
@@ -75,7 +83,6 @@ public class DownloadMangaManager {
             //mangabean也得remove
             tempMangaBean.getChapters().remove(0);
             DownloadBean.getInstance().setMangaBean(tempMangaBean);
-//            EventBus.getDefault().post(new DownLoadEvent(EventBusEvent.DOWNLOAD_CHAPTER_START_EVENT));
         }
 
         mangaName = DownloadBean.getInstance().initMangaFileName();
@@ -159,7 +166,9 @@ public class DownloadMangaManager {
 
     public void refreshCurrentPagesInfo(String url) {
         try {
-//            EventBus.getDefault().post(new DownLoadEvent(EventBusEvent.DOWNLOAD_PAGE_FINISH_EVENT));
+            if (null!=mDownloadController){
+                mDownloadController.setProgress();
+            }
             if (currentChapter.getPages().size() == 1 && currentChapter.getPages().get(0).getPage_url().equals(url)) {
                 //下载完一个章节
                 currentChapter = null;
