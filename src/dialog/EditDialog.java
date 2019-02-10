@@ -35,6 +35,14 @@ public class EditDialog {
         vBox.setPadding(new Insets(20,20,20,20));
 
         Scene scene = new Scene(vBox);
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode().toString().equals("ENTER")){
+                if (null!=listener){
+                    listener.onResult(inputField.getText());
+                }
+                window.close();
+            }
+        });
         window.setScene(scene);
         window.show();
     }

@@ -33,10 +33,10 @@ public class MangaReaderSpider extends SpiderBase {
                 try {
                     if (TextUtils.isEmpty(type) || type.equals("all")) {
                         doc = Jsoup.connect(webUrl + "popular/" + page)
-                                .timeout(10000).get();
+                                .timeout(timeoutV).get();
                     } else {
                         doc = Jsoup.connect(webUrl + "popular/" + type + "/" + page)
-                                .timeout(10000).get();
+                                .timeout(timeoutV).get();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -82,7 +82,7 @@ public class MangaReaderSpider extends SpiderBase {
             public void run() {
                 try {
                     doc = Jsoup.connect(mangaURL)
-                            .timeout(10000).get();
+                            .timeout(timeoutV).get();
                 } catch (IOException e) {
                     e.printStackTrace();
                     jsoupCallBack.loadFailed(e.toString());
@@ -215,7 +215,7 @@ public class MangaReaderSpider extends SpiderBase {
                     doc = Jsoup.connect(webUrl + "search/?w=" +
                             keyW +
                             "&rd=0&status=0&order=0&genre=0000000000000000000000000000000000000&p=0")
-                            .timeout(10000).get();
+                            .timeout(timeoutV).get();
                 } catch (Exception e) {
                     e.printStackTrace();
                     jsoupCallBack.loadFailed(e.toString());
@@ -266,7 +266,7 @@ public class MangaReaderSpider extends SpiderBase {
                 for (int i = 0; i < pageSize; i++) {
                     try {
                         doc = Jsoup.connect(chapterUrl + "/" + (i + 1))
-                                .timeout(10000).get();
+                                .timeout(timeoutV).get();
                     } catch (IOException e) {
                         e.printStackTrace();
                         jsoupCallBack.loadFailed(e.toString());
@@ -300,7 +300,7 @@ public class MangaReaderSpider extends SpiderBase {
             public void run() {
                 try {
                     doc = Jsoup.connect(url + "/" + 1)
-                            .timeout(10000).get();
+                            .timeout(timeoutV).get();
                 } catch (IOException e) {
                     e.printStackTrace();
                     jsoupCallBack.loadFailed(e.toString());

@@ -9,6 +9,7 @@ import listener.JsoupCallBack;
 
 public abstract class SpiderBase {
     protected org.jsoup.nodes.Document doc;
+    protected int timeoutV=60000;
 
     public enum SearchType {
         BY_MANGA_NAME,

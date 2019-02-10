@@ -33,10 +33,10 @@ public class KaKaLotSpider extends SpiderBase {
                 try {
                     if (TextUtils.isEmpty(type) || type.equals("all")) {
                         doc = Jsoup.connect(webUrl + "manga_list?type=topview&category=all&alpha=all&page=" + page + "&state=all")
-                                .timeout(10000).get();
+                                .timeout(timeoutV).get();
                     } else {
                         doc = Jsoup.connect(webUrl + "manga_list?type=topview&category=" + type + "&alpha=all&page=" + page + "&state=all")
-                                .timeout(10000).get();
+                                .timeout(timeoutV).get();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -70,7 +70,7 @@ public class KaKaLotSpider extends SpiderBase {
             public void run() {
                 try {
                     doc = Jsoup.connect(mangaURL)
-                            .timeout(10000).get();
+                            .timeout(timeoutV).get();
                 } catch (IOException e) {
                     e.printStackTrace();
                     jsoupCallBack.loadFailed(e.toString());
@@ -167,7 +167,7 @@ public class KaKaLotSpider extends SpiderBase {
             public void run() {
                 try {
                     doc = Jsoup.connect(chapterUrl)
-                            .timeout(10000).get();
+                            .timeout(timeoutV).get();
                 } catch (IOException e) {
                     e.printStackTrace();
                     jsoupCallBack.loadFailed(e.toString());
@@ -196,11 +196,11 @@ public class KaKaLotSpider extends SpiderBase {
                     switch (type) {
                         case BY_MANGA_AUTHOR:
                             doc = Jsoup.connect(webUrl + "search_author/" + keyW)
-                                    .timeout(10000).get();
+                                    .timeout(timeoutV).get();
                             break;
                         case BY_MANGA_NAME:
                             doc = Jsoup.connect(webUrl + "search/" + keyW)
-                                    .timeout(10000).get();
+                                    .timeout(timeoutV).get();
                             break;
                     }
                 } catch (Exception e) {

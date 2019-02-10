@@ -131,10 +131,10 @@ public class OnlineMangaDetailController extends BaseController implements Initi
 
     private void initGridView() {
         chapterGp.getChildren().clear();
-        int column = (int) (stackPaneWidth / 90);
+        int column = (int) (stackPaneWidth / 100);
         for (int i = 0; i < currentManga.getChapters().size(); i++) {
             Button button = new Button();
-            button.setPrefWidth(90);
+            button.setPrefWidth(100);
             ChapterBean item = currentManga.getChapters().get(i);
             button.setText("第" + item.getChapterPosition() + "话");
             final int pos = i;

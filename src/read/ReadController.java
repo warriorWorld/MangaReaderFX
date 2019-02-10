@@ -192,7 +192,7 @@ public class ReadController extends BaseController implements Initializable {
                 }
             });
         });
-        mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.92);
+        mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.9);
         imageCm = new ContextMenu();
         magnifyMi = new MenuItem("放大");
         magnifyMi.setOnAction(event -> {
@@ -204,7 +204,7 @@ public class ReadController extends BaseController implements Initializable {
         });
         recoverMi = new MenuItem("恢复大小");
         recoverMi.setOnAction(event -> {
-            mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.92);
+            mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.9);
         });
         deteleMi = new MenuItem("删除图片");
         deteleMi.setOnAction(event -> {

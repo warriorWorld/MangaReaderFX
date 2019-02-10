@@ -37,6 +37,11 @@ public class AlertDialog {
         vBox.setPadding(new Insets(20, 20, 20, 20));
 
         Scene scene = new Scene(vBox);
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode().toString().equals("ENTER")){
+                window.close();
+            }
+        });
         window.setScene(scene);
         window.showAndWait();
     }
