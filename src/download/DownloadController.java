@@ -99,6 +99,7 @@ public class DownloadController extends BaseController implements Initializable 
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                nameLb.setText("漫画名称:  " + DownloadBean.getInstance().getCurrentManga().getName());
                 explainLb.setText("正在下载:  第" +
                         DownloadMangaManager.getInstance().
                                 getCurrentChapter().getChapter_title() + "话");
