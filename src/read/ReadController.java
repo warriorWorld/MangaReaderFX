@@ -90,6 +90,7 @@ public class ReadController extends BaseController implements Initializable {
     @Override
     public void setScene(Scene scene) {
         super.setScene(scene);
+        scene.getStylesheets().add("/css/read.css");
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
@@ -144,6 +145,7 @@ public class ReadController extends BaseController implements Initializable {
     }
 
     private void initUI() {
+        mScrollPane.getStylesheets().add("/css/read.css");
         mIv.setPreserveRatio(true);
         jumpMi.setOnAction(event -> {
             EditDialog.display("跳转到", "请输入跳转位置(页码)", "确定", new EditResultListener() {

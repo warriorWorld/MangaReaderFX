@@ -349,6 +349,7 @@ public class MainController extends BaseController implements Initializable {
     @Override
     public void setScene(Scene scene) {
         super.setScene(scene);
+        scene.getStylesheets().add("/css/main.css");
         onlineMangaDetailcontroller.setScene(scene);
         //刷新线上漫画列表
         if (null != ShareObjUtil.getObject(ShareKeys.MAIN_PAGE_CHCHE)) {
