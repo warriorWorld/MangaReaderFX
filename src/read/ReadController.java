@@ -114,7 +114,12 @@ public class ReadController extends BaseController implements Initializable {
                     previousPage();
                 } else if (event.getCode().toString().equals("DELETE")) {
                     jsoup();
+                }else if (event.isControlDown()&&event.getCode().toString().equals("UP")){
+                    mIv.setFitHeight(mIv.getFitHeight() * 1.1);
+                }else if (event.isControlDown()&&event.getCode().toString().equals("DOWN")){
+                    mIv.setFitHeight(mIv.getFitHeight() * 0.9);
                 }
+
                 if (TextUtils.isEmpty(currentInput)) {
                     currentInputLb.setText("直接输入单词或句子,然后回车即可翻译单词或句子.");
                 } else {
