@@ -57,6 +57,7 @@ import spider.FileSpider;
 import spider.SpiderBase;
 import utils.ReplaceUtil;
 import utils.ShareObjUtil;
+import utils.TextUtils;
 
 public class MainController extends BaseController implements Initializable {
     public ListView menuLv;
@@ -71,7 +72,7 @@ public class MainController extends BaseController implements Initializable {
     public Label userNameLb;
     public MenuItem directoryChooserMi;
     public ChoiceBox<String> siteCb, searchTypeCb;
-    private Parent optionsRoot, mangaDetailRoot,downloadRoot;
+    private Parent optionsRoot, mangaDetailRoot, downloadRoot;
     private ScrollPane onlineScrollPane, localScrollPane;
     private GridPane onlineGrid, localGrid;
     public Button previousBtn;
@@ -88,6 +89,7 @@ public class MainController extends BaseController implements Initializable {
     private ArrayList<String> histroyPath = new ArrayList<>();
     private String deleteTargetPath = "";
     private ContextMenu itemCm;
+    private boolean secretToggle = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -287,6 +289,10 @@ public class MainController extends BaseController implements Initializable {
                                 break;
                         }
                         doGetSearchData(type, searchTf.getText());
+                    } else if (event.getCode().toString().equals("ADD")) {
+                        Preferences mPreferences = Preferences.userRoot();
+                        mPreferences.put(ShareKeys.SECRET_MANGA_DIRECTORY_KEY, searchTf.getText().replaceAll("\\\\", "/"));
+                        searchTf.setText("");
                     }
                 }
             });
@@ -366,6 +372,24 @@ public class MainController extends BaseController implements Initializable {
         pageTf.setText(currentPage + "");
         //刷新本地漫画地址
         doGetLocalManga(Configure.getMangaDirectory());
+        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                System.out.println(event.getCode());
+                if (event.getCode().toString().equals("BACK_QUOTE")) {
+                    Preferences mPreferences = Preferences.userRoot();
+                    String secretPath = mPreferences.get(ShareKeys.SECRET_MANGA_DIRECTORY_KEY, "");
+                    if (!TextUtils.isEmpty(secretPath)) {
+                        if (secretToggle){
+                            doGetLocalManga(Configure.getMangaDirectory());
+                        }else {
+                            doGetLocalManga(secretPath);
+                        }
+                        secretToggle=!secretToggle;
+                    }
+                }
+            }
+        });
     }
 
     private void doGetData(int page) {
@@ -601,7 +625,7 @@ public class MainController extends BaseController implements Initializable {
                 MangaBean mangaItem = localMangaList.get(i);
                 try {
                     itemController.setLocalThumbil(new File(mangaItem.getLocalThumbnailUrl()).toURI().toURL().toString());
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 itemController.setMangaName(mangaItem.getName());
