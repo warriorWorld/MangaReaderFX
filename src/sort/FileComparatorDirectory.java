@@ -10,7 +10,7 @@ public class FileComparatorDirectory implements Comparator<MangaBean> {
     private int chapterR;
 
     private void analysis(String s, boolean which) {
-        String[] arri = s.split("/");
+        String[] arri = s.split("\\\\");
         s = arri[arri.length - 2];
         String[] arri1 = s.split("-");
         s = arri1[0];

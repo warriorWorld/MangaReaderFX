@@ -555,7 +555,7 @@ public class MainController extends BaseController implements Initializable {
                 FileComparatorWithBracket comparator1 = new FileComparatorWithBracket();
                 Collections.sort(pathList, comparator1);
             } else {
-                String[] arri = firstImgName.split("/");
+                String[] arri = firstImgName.split("\\\\");
                 //最终获得图片名字
                 firstImgName = arri[arri.length - 1];
                 try {
@@ -577,7 +577,7 @@ public class MainController extends BaseController implements Initializable {
             //有很多话的漫画的文件夹层
             try {
                 String firstDirectoryName = pathList.get(0);
-                String[] arri = firstDirectoryName.split("/");
+                String[] arri = firstDirectoryName.split("\\\\");
 
                 firstDirectoryName = arri[arri.length - 2];
                 String[] arri1 = firstDirectoryName.split("-");

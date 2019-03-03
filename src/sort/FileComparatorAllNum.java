@@ -29,7 +29,7 @@ public class FileComparatorAllNum implements Comparator<String> {
         } else if (s.contains(".jpeg")) {
             s = s.substring(0, s.length() - 1 - 4);
         }
-        String[] arri = s.split("/");
+        String[] arri = s.split("\\\\");
         s = arri[arri.length - 1];
         try {
             if (which) {
