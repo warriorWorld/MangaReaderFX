@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.prefs.Preferences;
 
 import base.BaseController;
 import bean.ChapterBean;
@@ -23,6 +24,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import listener.EditResultListener;
@@ -41,9 +45,12 @@ public class OnlineMangaDetailController extends BaseController implements Initi
     private MangaBean currentManga;
     private int stackPaneWidth = 0;
     private SpiderBase spider;
+    private Preferences mPreferences;
+    private int lastChapter = 0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        mPreferences = Preferences.userRoot();
         initUI();
     }
 
@@ -59,7 +66,7 @@ public class OnlineMangaDetailController extends BaseController implements Initi
                 public void onResult(String result) {
                     try {
                         String[] res = result.split("\\-");
-                        doDownload(Integer.valueOf(res[0])-1, Integer.valueOf(res[1])-1);
+                        doDownload(Integer.valueOf(res[0]) - 1, Integer.valueOf(res[1]) - 1);
                     } catch (Exception e) {
                         e.printStackTrace();
                         AlertDialog.display("请按格式输入");
@@ -98,15 +105,15 @@ public class OnlineMangaDetailController extends BaseController implements Initi
         new Thread(new Runnable() {
             @Override
             public void run() {
-                    final Image image;
-                    image = ImgUtil.createImage(currentManga.getWebThumbnailUrl());
+                final Image image;
+                image = ImgUtil.createImage(currentManga.getWebThumbnailUrl());
 
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            mangaIv.setImage(image);
-                        }
-                    });
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        mangaIv.setImage(image);
+                    }
+                });
             }
         }).start();
         Platform.runLater(new Runnable() {
@@ -124,6 +131,7 @@ public class OnlineMangaDetailController extends BaseController implements Initi
                 typeLb.setText("类型:" + mangaTags);
                 lastUpdateLb.setText("最后更新:" + currentManga.getLast_update());
 
+                lastChapter=receiveProgress();
                 initGridView();
             }
         });
@@ -135,11 +143,17 @@ public class OnlineMangaDetailController extends BaseController implements Initi
         for (int i = 0; i < currentManga.getChapters().size(); i++) {
             Button button = new Button();
             button.setPrefWidth(100);
+            if (lastChapter == i) {
+                button.getStylesheets().add("/css/red_button.css");
+            }
             ChapterBean item = currentManga.getChapters().get(i);
             button.setText("第" + item.getChapterPosition() + "话");
             final int pos = i;
             button.setOnAction(event -> {
+                lastChapter=pos;
+                saveProgress();
                 openReadManga(pos);
+                initGridView();
             });
             chapterGp.add(button, (i % column), (int) (i / column));
         }
@@ -184,6 +198,14 @@ public class OnlineMangaDetailController extends BaseController implements Initi
         DownloadBean.getInstance().initDownloadChapters();
         DownloadBean.getInstance().setWebSite(BaseParameterUtil.getInstance().getCurrentWebSite());
         DownloadMangaManager.getInstance().doDownload();
+    }
+
+    private void saveProgress() {
+        mPreferences.putInt(currentManga.getName() + "lastReadChapter", lastChapter);
+    }
+
+    private int receiveProgress() {
+        return mPreferences.getInt(currentManga.getName() + "lastReadChapter", 0);
     }
 
     public void setStackPaneWidth(int stackPaneWidth) {
