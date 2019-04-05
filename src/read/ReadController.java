@@ -74,6 +74,8 @@ public class ReadController extends BaseController implements Initializable {
     private int chapterPos = 0;
     private ContextMenu imageCm;
     private MenuItem magnifyMi, shrinkMi, recoverMi, deteleMi, saveMi;
+    private double currentMouseY = 0d, currentMouseYPercent = 0d;;
+    private boolean startAnchorZoom = false;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -116,13 +118,13 @@ public class ReadController extends BaseController implements Initializable {
                 } else if (event.getCode().toString().equals("DELETE")) {
                     jsoup();
                 } else if (event.isControlDown() && event.getCode().toString().equals("UP")) {
-                    mScrollPane.setVvalue(0);
+                    anchorZoomImg(1.1);
                 } else if (event.isControlDown() && event.getCode().toString().equals("DOWN")) {
-                    mScrollPane.setVvalue(1);
-                }else if (!event.isControlDown() && event.getCode().toString().equals("UP")) {
-                    mScrollPane.setVvalue(mScrollPane.getVvalue()-0.1);
+                    anchorZoomImg(0.9);
+                } else if (!event.isControlDown() && event.getCode().toString().equals("UP")) {
+                    mScrollPane.setVvalue(mScrollPane.getVvalue() - 0.3);
                 } else if (!event.isControlDown() && event.getCode().toString().equals("DOWN")) {
-                    mScrollPane.setVvalue(mScrollPane.getVvalue()+0.1);
+                    mScrollPane.setVvalue(mScrollPane.getVvalue() + 0.3);
                 }
 
                 if (TextUtils.isEmpty(currentInput)) {
@@ -153,24 +155,46 @@ public class ReadController extends BaseController implements Initializable {
             }
         });
 
+        mIv.setOnMouseMoved(event -> {
+            currentMouseY = event.getY();
+        });
+
         mScrollPane.addEventFilter(ScrollEvent.ANY, new EventHandler<ScrollEvent>() {
             @Override
             public void handle(ScrollEvent event) {
                 if (event.isControlDown() && event.getDeltaY() > 0) {
-                    mIv.setFitHeight(mIv.getFitHeight() * 1.1);
+                    anchorZoomImg(1.1);
                     event.consume();
                 } else if (event.isControlDown() && event.getDeltaY() < 0) {
-                    mIv.setFitHeight(mIv.getFitHeight() * 0.9);
+                    anchorZoomImg(0.9);
                     event.consume();
-                }else if (!event.isControlDown() && event.getDeltaY() > 0) {
-                    mScrollPane.setVvalue(mScrollPane.getVvalue()-0.2);
+                } else if (!event.isControlDown() && event.getDeltaY() > 0) {
+                    mScrollPane.setVvalue(mScrollPane.getVvalue() - 0.3);
                     event.consume();
-                }else if (!event.isControlDown() && event.getDeltaY() < 0) {
-                    mScrollPane.setVvalue(mScrollPane.getVvalue()+0.2);
+                } else if (!event.isControlDown() && event.getDeltaY() < 0) {
+                    mScrollPane.setVvalue(mScrollPane.getVvalue() + 0.3);
                     event.consume();
                 }
             }
         });
+        scene.setOnKeyReleased(event -> {
+            if (event.getCode().toString().equals("CONTROL")) {
+                System.out.println("released control");
+                startAnchorZoom = false;
+            }
+        });
+    }
+
+    private void anchorZoomImg(double percent) {
+        if (!startAnchorZoom) {
+            double totalY = mIv.getFitHeight();
+            currentMouseYPercent = currentMouseY / totalY;
+            System.out.println(currentMouseY + "," + totalY + "," + currentMouseYPercent);
+            startAnchorZoom = true;
+        }
+
+        mIv.setFitHeight(mIv.getFitHeight() * percent);
+        mScrollPane.setVvalue(currentMouseYPercent);
     }
 
     private void initUI() {
