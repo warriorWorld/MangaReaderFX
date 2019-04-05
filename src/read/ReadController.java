@@ -43,6 +43,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import listener.EditResultListener;
@@ -114,10 +115,14 @@ public class ReadController extends BaseController implements Initializable {
                     previousPage();
                 } else if (event.getCode().toString().equals("DELETE")) {
                     jsoup();
-                }else if (event.isControlDown()&&event.getCode().toString().equals("UP")){
-                    mIv.setFitHeight(mIv.getFitHeight() * 1.1);
-                }else if (event.isControlDown()&&event.getCode().toString().equals("DOWN")){
-                    mIv.setFitHeight(mIv.getFitHeight() * 0.9);
+                } else if (event.isControlDown() && event.getCode().toString().equals("UP")) {
+                    mScrollPane.setVvalue(0);
+                } else if (event.isControlDown() && event.getCode().toString().equals("DOWN")) {
+                    mScrollPane.setVvalue(1);
+                }else if (!event.isControlDown() && event.getCode().toString().equals("UP")) {
+                    mScrollPane.setVvalue(mScrollPane.getVvalue()-0.1);
+                } else if (!event.isControlDown() && event.getCode().toString().equals("DOWN")) {
+                    mScrollPane.setVvalue(mScrollPane.getVvalue()+0.1);
                 }
 
                 if (TextUtils.isEmpty(currentInput)) {
@@ -144,6 +149,25 @@ public class ReadController extends BaseController implements Initializable {
                     imageCm.show(stage, event.getScreenX(), event.getScreenY());
                 } else {
                     imageCm.hide();
+                }
+            }
+        });
+
+        mScrollPane.addEventFilter(ScrollEvent.ANY, new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent event) {
+                if (event.isControlDown() && event.getDeltaY() > 0) {
+                    mIv.setFitHeight(mIv.getFitHeight() * 1.1);
+                    event.consume();
+                } else if (event.isControlDown() && event.getDeltaY() < 0) {
+                    mIv.setFitHeight(mIv.getFitHeight() * 0.9);
+                    event.consume();
+                }else if (!event.isControlDown() && event.getDeltaY() > 0) {
+                    mScrollPane.setVvalue(mScrollPane.getVvalue()-0.2);
+                    event.consume();
+                }else if (!event.isControlDown() && event.getDeltaY() < 0) {
+                    mScrollPane.setVvalue(mScrollPane.getVvalue()+0.2);
+                    event.consume();
                 }
             }
         });
@@ -374,7 +398,7 @@ public class ReadController extends BaseController implements Initializable {
         mSourceType = SourceType.ONLINE;
         imageCm.getItems().addAll(magnifyMi, shrinkMi, recoverMi, saveMi);
         path = url;
-        title = mangaName+"("+(chapterPosition+1)+")";
+        title = mangaName + "(" + (chapterPosition + 1) + ")";
         chapterPos = chapterPosition;
         stage.setTitle(title + Configure.LOADING);
 
