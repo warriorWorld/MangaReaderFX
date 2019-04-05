@@ -374,7 +374,7 @@ public class ReadController extends BaseController implements Initializable {
         mSourceType = SourceType.ONLINE;
         imageCm.getItems().addAll(magnifyMi, shrinkMi, recoverMi, saveMi);
         path = url;
-        title = mangaName;
+        title = mangaName+"("+(chapterPosition+1)+")";
         chapterPos = chapterPosition;
         stage.setTitle(title + Configure.LOADING);
 
