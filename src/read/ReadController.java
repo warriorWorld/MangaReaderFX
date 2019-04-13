@@ -322,7 +322,7 @@ public class ReadController extends BaseController implements Initializable {
                 stage.setTitle(title);
                 break;
             case ONLINE:
-                if (page < paths.size() - 2) {
+                if (page <= paths.size() - 2) {
                     //预加载下一页
                     if (null == cacheList.get(page + 1)) {
                         new Thread(new Runnable() {
