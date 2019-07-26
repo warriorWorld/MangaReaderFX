@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="javafx" name="javafx_workspace">
+  <artifact type="javafx" build-on-make="true" name="javafx_workspace">
     <output-path>$PROJECT_DIR$/out/artifacts/javafx_workspace</output-path>
     <properties id="javafx-properties">
       <options>
