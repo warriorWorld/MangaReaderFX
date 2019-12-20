@@ -172,7 +172,7 @@ public class KaKaLotSpider extends SpiderBase {
                     jsoupCallBack.loadFailed(e.toString());
                 }
                 if (null != doc) {
-                    Elements mangaPicsElements = doc.select("div.vung-doc").first().getElementsByTag("img");
+                    Elements mangaPicsElements = doc.select("div.container-chapter-reader").first().getElementsByTag("img");
                     ArrayList<String> pathList = new ArrayList<String>();
                     for (int i = 0; i < mangaPicsElements.size(); i++) {
                         pathList.add(mangaPicsElements.get(i).attr("src"));
