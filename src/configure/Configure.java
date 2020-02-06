@@ -15,7 +15,7 @@ public class Configure {
     public final static String VERSION = "1.0";
     //数据库版本号
     public static final int DB_VERSION = 1;
-    public final static String[] websList = {"KaKaLot", "MangaReader"};
+    public final static String[] websList = {"KaKaLot", "MangaReader","Owl"};
     public final static String[] masterWebsList = {"MangaReader", "NManga", "KaKaLot", "LManga"};
     public final static String[] VPN_MUST_LIST = {"NOTHING"};
     private final static String DST_FOLDER_NAME = "Manga";
