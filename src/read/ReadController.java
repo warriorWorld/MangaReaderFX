@@ -5,8 +5,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.awt.GraphicsEnvironment;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -53,7 +51,6 @@ import okhttp.HttpService;
 import spider.FileSpider;
 import spider.SpiderBase;
 import utils.ImgUtil;
-import utils.ReplaceUtil;
 import utils.TextUtils;
 
 public class ReadController extends BaseController implements Initializable {
@@ -73,8 +70,9 @@ public class ReadController extends BaseController implements Initializable {
     private HashMap<Integer, Image> cacheList = new HashMap<>();
     private int chapterPos = 0;
     private ContextMenu imageCm;
-    private MenuItem magnifyMi, shrinkMi, recoverMi, deteleMi, saveMi;
-    private double currentMouseY = 0d, currentMouseYPercent = 0d;;
+    private MenuItem magnifyMi, shrinkMi, recoverMi, deteleMi, saveMi, refreshMi;
+    private double currentMouseY = 0d, currentMouseYPercent = 0d;
+    ;
     private boolean startAnchorZoom = false;
 
     @Override
@@ -247,6 +245,10 @@ public class ReadController extends BaseController implements Initializable {
         });
         mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.9);
         imageCm = new ContextMenu();
+        refreshMi = new MenuItem("刷新");
+        refreshMi.setOnAction(event -> {
+            toPage(currentPosition);
+        });
         magnifyMi = new MenuItem("放大");
         magnifyMi.setOnAction(event -> {
             mIv.setFitHeight(mIv.getFitHeight() * 1.1);
@@ -322,6 +324,8 @@ public class ReadController extends BaseController implements Initializable {
                 stage.setTitle(title);
                 break;
             case ONLINE:
+                mIv.setFitHeight(50);
+                mIv.setImage(new Image("/drawable/loading.png"));
                 if (page <= paths.size() - 2) {
                     //预加载下一页
                     if (null == cacheList.get(page + 1)) {
@@ -330,12 +334,15 @@ public class ReadController extends BaseController implements Initializable {
                             public void run() {
                                 final Image image;
                                 image = ImgUtil.createImage(paths.get(page + 1));
-                                cacheList.put(page + 1, image);
+                                if (null != image) {
+                                    cacheList.put(page + 1, image);
+                                }
                             }
                         }).start();
                     }
                 }
                 if (null != cacheList.get(page)) {
+                    mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.9);
                     mIv.setImage(cacheList.get(page));
                     stage.setTitle(title);
                     return;
@@ -345,13 +352,22 @@ public class ReadController extends BaseController implements Initializable {
                     public void run() {
                         final Image image;
                         image = ImgUtil.createImage(paths.get(page));
-                        cacheList.put(page, image);
+                        if (null != image) {
+                            cacheList.put(page, image);
+                        }
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
                                 if (page == currentPosition) {
-                                    mIv.setImage(image);
-                                    stage.setTitle(title);
+                                    if (null != image) {
+                                        mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.9);
+                                        mIv.setImage(image);
+                                        stage.setTitle(title);
+                                    } else {
+                                        mIv.setFitHeight(50);
+                                        mIv.setImage(new Image("/drawable/loadfailed.png"));
+                                        stage.setTitle(title + Configure.LOAD_FAILED);
+                                    }
                                 }
                             }
                         });
