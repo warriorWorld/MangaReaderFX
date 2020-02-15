@@ -73,8 +73,8 @@ public class MainController extends BaseController implements Initializable {
     public MenuItem directoryChooserMi;
     public ChoiceBox<String> siteCb, searchTypeCb;
     private Parent optionsRoot, mangaDetailRoot, downloadRoot;
-    private ScrollPane onlineScrollPane, localScrollPane;
-    private GridPane onlineGrid, localGrid;
+    private ScrollPane onlineScrollPane, localScrollPane, collectedScrollPane;
+    private GridPane onlineGrid, localGrid, collectedGrid;
     public Button previousBtn;
     public Button nextBtn;
     public TextField pageTf;
@@ -106,6 +106,8 @@ public class MainController extends BaseController implements Initializable {
             onlineMangaDetailcontroller = fxmlLoader1.getController(); //获取Controller的实例对象
             //本地漫画
             initLocalPaneUI();
+            //收藏漫画
+            initCollectedaneUI();
             //正在下载
             FXMLLoader fxmlLoader2 = new FXMLLoader(getClass().getResource("/fxml/downloading.fxml"));
             downloadRoot = fxmlLoader2.load();
@@ -339,6 +341,11 @@ public class MainController extends BaseController implements Initializable {
                 mStackPane.getChildren().clear();
                 mStackPane.getChildren().add(localScrollPane);
                 break;
+            case 2:
+                initCollectedList();
+                mStackPane.getChildren().clear();
+                mStackPane.getChildren().add(collectedScrollPane);
+                break;
             case 6:
                 break;
             case 7:
@@ -380,12 +387,12 @@ public class MainController extends BaseController implements Initializable {
                     Preferences mPreferences = Preferences.userRoot();
                     String secretPath = mPreferences.get(ShareKeys.SECRET_MANGA_DIRECTORY_KEY, "");
                     if (!TextUtils.isEmpty(secretPath)) {
-                        if (secretToggle){
+                        if (secretToggle) {
                             doGetLocalManga(Configure.getMangaDirectory());
-                        }else {
+                        } else {
                             doGetLocalManga(secretPath);
                         }
-                        secretToggle=!secretToggle;
+                        secretToggle = !secretToggle;
                     }
                 }
             }
@@ -448,6 +455,15 @@ public class MainController extends BaseController implements Initializable {
         onlineScrollPane.setContent(onlineGrid);
     }
 
+    private void initCollectedaneUI() {
+        collectedScrollPane = new ScrollPane();
+        collectedGrid = new GridPane();
+        collectedGrid.setPadding(new Insets(10, 10, 10, 10));
+        collectedGrid.setVgap(8);
+        collectedGrid.setHgap(10);
+        collectedScrollPane.setContent(collectedGrid);
+    }
+
     private void initOnlineList() {
         try {
             onlineGrid.getChildren().clear();
@@ -480,6 +496,48 @@ public class MainController extends BaseController implements Initializable {
                     }
                 });
                 onlineGrid.add(item, (i % column), (int) (i / column));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initCollectedList() {
+        try {
+            collectedGrid.getChildren().clear();
+            stackPaneWidth = (int) (scene.getWidth() - menuLv.getWidth());
+            int column = (int) (stackPaneWidth / 200) - 1;
+            ArrayList<MangaBean> collected = (ArrayList<MangaBean>) ShareObjUtil.getObject(ShareKeys.COLLECTED_MANGA);
+            if (null == collected || collected.size() <= 0) {
+                return;
+            }
+            for (int i = 0; i < collected.size(); i++) {
+                FXMLLoader fxmlLoader1 = new FXMLLoader(getClass().getResource("/fxml/item_manga_list.fxml"));
+                Parent item = fxmlLoader1.load();
+                ItemMangaController itemController = fxmlLoader1.getController();
+                MangaBean mangaItem = collected.get(i);
+                itemController.setMangaThumbil(mangaItem.getWebThumbnailUrl());
+                itemController.setMangaName(mangaItem.getName());
+                itemController.setOnClickListener(i, new OnItemClickListener() {
+                    @Override
+                    public void onClick(int position) {
+                        mStackPane.getChildren().clear();
+                        mStackPane.getChildren().add(mangaDetailRoot);
+                        onlineMangaDetailcontroller.setStackPaneWidth(stackPaneWidth);
+                        onlineMangaDetailcontroller.setUrl(collected.get(position).getUrl(), spider);
+                    }
+
+                    @Override
+                    public void onRightClick(int position) {
+
+                    }
+
+                    @Override
+                    public void onMouseEvent(int position, MouseEvent event) {
+
+                    }
+                });
+                collectedGrid.add(item, (i % column), (int) (i / column));
             }
         } catch (IOException e) {
             e.printStackTrace();

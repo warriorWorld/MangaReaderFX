@@ -12,9 +12,11 @@ import bean.DownloadBean;
 import bean.MangaBean;
 import configure.BaseParameterUtil;
 import configure.Configure;
+import configure.ShareKeys;
 import dialog.AlertDialog;
 import dialog.EditDialog;
 import download.DownloadMangaManager;
+import enums.CollectState;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -36,6 +38,7 @@ import mangalist.ItemMangaController;
 import read.ReadController;
 import spider.SpiderBase;
 import utils.ImgUtil;
+import utils.ShareObjUtil;
 
 public class OnlineMangaDetailController extends BaseController implements Initializable {
     public Label nameLb, authorLb, typeLb, lastUpdateLb;
@@ -47,15 +50,34 @@ public class OnlineMangaDetailController extends BaseController implements Initi
     private SpiderBase spider;
     private Preferences mPreferences;
     private int lastChapter = 0;
+    private ArrayList<MangaBean> collected = (ArrayList<MangaBean>) ShareObjUtil.getObject(ShareKeys.COLLECTED_MANGA);
+    private CollectState mCollectState;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         mPreferences = Preferences.userRoot();
+        if (null == collected) {
+            collected = new ArrayList<>();
+        }
         initUI();
     }
 
     private void initUI() {
         collectBtn.setOnAction(event -> {
+            switch (mCollectState) {
+                case COLLECTED:
+                    removeCollect();
+                    ShareObjUtil.saveObject(collected, ShareKeys.COLLECTED_MANGA);
+                    mCollectState = CollectState.UNCOLLECT;
+                    collectBtn.setText("收藏");
+                    break;
+                case UNCOLLECT:
+                    collected.add(currentManga);
+                    ShareObjUtil.saveObject(collected, ShareKeys.COLLECTED_MANGA);
+                    mCollectState = CollectState.COLLECTED;
+                    collectBtn.setText("取消收藏");
+                    break;
+            }
         });
         downloadAllBtn.setOnAction(event -> {
             downloadAll();
@@ -91,6 +113,7 @@ public class OnlineMangaDetailController extends BaseController implements Initi
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
+                        stage.setTitle(Configure.NAME + Configure.LOAD_FAILED);
                         AlertDialog.display("错误", error, "确定");
                     }
                 });
@@ -122,7 +145,13 @@ public class OnlineMangaDetailController extends BaseController implements Initi
                 stage.setTitle(Configure.NAME);
                 nameLb.setText("漫画名称:" + currentManga.getName());
                 authorLb.setText("作者:" + currentManga.getAuthor());
-
+                if (isCollected()) {
+                    mCollectState = CollectState.COLLECTED;
+                    collectBtn.setText("取消收藏");
+                } else {
+                    mCollectState = CollectState.UNCOLLECT;
+                    collectBtn.setText("收藏");
+                }
                 String mangaTags = "";
                 for (int i = 0; i < currentManga.getTypes().length; i++) {
                     //漫画类型
@@ -131,10 +160,33 @@ public class OnlineMangaDetailController extends BaseController implements Initi
                 typeLb.setText("类型:" + mangaTags);
                 lastUpdateLb.setText("最后更新:" + currentManga.getLast_update());
 
-                lastChapter=receiveProgress();
+                lastChapter = receiveProgress();
                 initGridView();
             }
         });
+    }
+
+    private boolean isCollected() {
+        if (null == collected || collected.size() <= 0) {
+            return false;
+        }
+        for (MangaBean item : collected) {
+            if (currentManga.getUrl().equals(item.getUrl())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void removeCollect() {
+        if (null == collected || collected.size() <= 0) {
+            return;
+        }
+        for (MangaBean item : collected) {
+            if (currentManga.getUrl().equals(item.getUrl())) {
+                collected.remove(item);
+            }
+        }
     }
 
     private void initGridView() {
@@ -150,7 +202,7 @@ public class OnlineMangaDetailController extends BaseController implements Initi
             button.setText("第" + item.getChapterPosition() + "话");
             final int pos = i;
             button.setOnAction(event -> {
-                lastChapter=pos;
+                lastChapter = pos;
                 saveProgress();
                 openReadManga(pos);
                 initGridView();
