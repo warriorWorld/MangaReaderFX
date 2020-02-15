@@ -436,7 +436,7 @@ public class ReadController extends BaseController implements Initializable {
 
     public void setOnlinePath(String url, String mangaName, int chapterPosition, SpiderBase spider) {
         mSourceType = SourceType.ONLINE;
-        imageCm.getItems().addAll(magnifyMi, shrinkMi, recoverMi, saveMi);
+        imageCm.getItems().addAll(refreshMi,magnifyMi, shrinkMi, recoverMi, saveMi);
         path = url;
         title = mangaName + "(" + (chapterPosition + 1) + ")";
         chapterPos = chapterPosition;
