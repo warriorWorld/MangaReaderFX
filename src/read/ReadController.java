@@ -72,13 +72,15 @@ public class ReadController extends BaseController implements Initializable {
     private ContextMenu imageCm;
     private MenuItem magnifyMi, shrinkMi, recoverMi, deteleMi, saveMi, refreshMi;
     private double currentMouseY = 0d, currentMouseYPercent = 0d;
-    ;
     private boolean startAnchorZoom = false;
+    private Image loadingImg, failedImg;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         mClipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         mPreferences = Preferences.userRoot();
+        loadingImg = new Image("/drawable/loading.png");
+        failedImg = new Image("/drawable/loadfailed.png");
         initUI();
     }
 
@@ -325,56 +327,79 @@ public class ReadController extends BaseController implements Initializable {
                 break;
             case ONLINE:
                 mIv.setFitHeight(50);
-                mIv.setImage(new Image("/drawable/loading.png"));
-                if (page <= paths.size() - 2) {
-                    //预加载下一页
-                    if (null == cacheList.get(page + 1)) {
+                mIv.setImage(loadingImg);
+                //预加载
+                int preLoadCount = 2;
+                for (int i = 0; i < preLoadCount; i++) {
+                    final int prePos = page + i + 1;
+                    if (null == cacheList.get(prePos)) {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                final Image image;
-                                image = ImgUtil.createImage(paths.get(page + 1));
-                                if (null != image) {
-                                    cacheList.put(page + 1, image);
+                                System.out.println("thread: " + prePos);
+                                cacheList.put(prePos, loadingImg);
+                                try {
+                                    final Image image;
+                                    image = ImgUtil.createImage(paths.get(prePos));
+                                    if (null != image) {
+                                        cacheList.put(prePos, image);
+                                        System.out.println("thread: " + prePos + " done");
+                                        showImg(prePos, image);
+                                    }
+                                } catch (IndexOutOfBoundsException e) {
+                                    e.printStackTrace();
                                 }
                             }
                         }).start();
                     }
                 }
+                //如有缓存 直接用
                 if (null != cacheList.get(page)) {
-                    mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.9);
-                    mIv.setImage(cacheList.get(page));
-                    stage.setTitle(title);
+                    showImg(page, cacheList.get(page));
                     return;
                 }
+                //加载当前页
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        System.out.println("thread current: " + page);
+                        cacheList.put(page, loadingImg);
                         final Image image;
                         image = ImgUtil.createImage(paths.get(page));
                         if (null != image) {
                             cacheList.put(page, image);
                         }
-                        Platform.runLater(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (page == currentPosition) {
-                                    if (null != image) {
-                                        mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.9);
-                                        mIv.setImage(image);
-                                        stage.setTitle(title);
-                                    } else {
-                                        mIv.setFitHeight(50);
-                                        mIv.setImage(new Image("/drawable/loadfailed.png"));
-                                        stage.setTitle(title + Configure.LOAD_FAILED);
-                                    }
-                                }
-                            }
-                        });
+                        System.out.println("thread current: " + page + " done");
+                        showImg(page, image);
                     }
                 }).start();
                 break;
         }
+    }
+
+    private void showImg(int page, Image image) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                if (page == currentPosition) {
+                    if (null != image) {
+                        if (image.equals(loadingImg)) {
+                            mIv.setFitHeight(50);
+                            mIv.setImage(loadingImg);
+                            stage.setTitle(title + Configure.LOADING);
+                        } else {
+                            mIv.setFitHeight(Screen.getPrimary().getVisualBounds().getHeight() * 0.9);
+                            mIv.setImage(image);
+                            stage.setTitle(title);
+                        }
+                    } else {
+                        mIv.setFitHeight(50);
+                        mIv.setImage(failedImg);
+                        stage.setTitle(title + Configure.LOAD_FAILED);
+                    }
+                }
+            }
+        });
     }
 
     private void nextPage() {
@@ -436,7 +461,7 @@ public class ReadController extends BaseController implements Initializable {
 
     public void setOnlinePath(String url, String mangaName, int chapterPosition, SpiderBase spider) {
         mSourceType = SourceType.ONLINE;
-        imageCm.getItems().addAll(refreshMi,magnifyMi, shrinkMi, recoverMi, saveMi);
+        imageCm.getItems().addAll(refreshMi, magnifyMi, shrinkMi, recoverMi, saveMi);
         path = url;
         title = mangaName + "(" + (chapterPosition + 1) + ")";
         chapterPos = chapterPosition;
