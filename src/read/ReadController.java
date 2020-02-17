@@ -249,6 +249,7 @@ public class ReadController extends BaseController implements Initializable {
         imageCm = new ContextMenu();
         refreshMi = new MenuItem("刷新");
         refreshMi.setOnAction(event -> {
+            cacheList.remove(currentPosition);
             toPage(currentPosition);
         });
         magnifyMi = new MenuItem("放大");
