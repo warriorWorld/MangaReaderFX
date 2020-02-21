@@ -330,7 +330,7 @@ public class ReadController extends BaseController implements Initializable {
                 mIv.setFitHeight(50);
                 mIv.setImage(loadingImg);
                 //预加载
-                int preLoadCount = 2;
+                int preLoadCount = 1;
                 for (int i = 0; i < preLoadCount; i++) {
                     final int prePos = page + i + 1;
                     if (null == cacheList.get(prePos)) {
