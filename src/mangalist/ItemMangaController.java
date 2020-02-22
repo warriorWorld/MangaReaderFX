@@ -7,6 +7,8 @@ import java.net.URLConnection;
 import java.util.ResourceBundle;
 
 import base.BaseController;
+import imageloader.DiskCache;
+import imageloader.ImageLoader;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
@@ -22,28 +24,32 @@ import utils.ImgUtil;
 public class ItemMangaController extends BaseController implements Initializable {
     public ImageView mangaIv;
     public Label mangaNameLb;
+    private ImageLoader mImageLoader;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         mangaIv.setPreserveRatio(true);
+        mImageLoader = new ImageLoader();
+        mImageLoader.setImageCache(new DiskCache());
     }
 
     public void setMangaThumbil(String img) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-//                Image image = new Image(img);
-                final Image image;
-                image = ImgUtil.createImage(img);
-
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        mangaIv.setImage(image);
-                    }
-                });
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+////                Image image = new Image(img);
+//                final Image image;
+//                image = ImgUtil.createImage(img);
+//
+//                Platform.runLater(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mangaIv.setImage(image);
+//                    }
+//                });
+//            }
+//        }).start();
+        mImageLoader.displayImage(img, mangaIv);
     }
 
     public void setLocalThumbil(String img) {
@@ -56,11 +62,11 @@ public class ItemMangaController extends BaseController implements Initializable
 
 
     public void setOnClickListener(int position, OnItemClickListener listener) {
-        EventHandler<MouseEvent> mouseEventEventHandler=new EventHandler<MouseEvent>() {
+        EventHandler<MouseEvent> mouseEventEventHandler = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if (null != listener) {
-                    listener.onMouseEvent(position,event);
+                    listener.onMouseEvent(position, event);
                 }
                 if (event.getButton() == MouseButton.PRIMARY) {
                     if (null != listener) {
