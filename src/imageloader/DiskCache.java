@@ -17,7 +17,7 @@ public class DiskCache implements ImageCache {
                 return null;
             }
             return new Image(file.toURI().toURL().toString());
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
