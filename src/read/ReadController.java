@@ -345,8 +345,8 @@ public class ReadController extends BaseController implements Initializable {
                                     if (null != image) {
                                         cacheList.put(prePos, image);
                                         System.out.println("thread: " + prePos + " done");
-                                        showImg(prePos, image);
                                     }
+                                    showImg(prePos, image);
                                 } catch (IndexOutOfBoundsException e) {
                                     e.printStackTrace();
                                 }
